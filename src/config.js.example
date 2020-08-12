@@ -5,7 +5,7 @@ const logSheetId = "<put log sheet id here>";
 const deploymentId = "<put webapp id here>"
 
 // Run function setWebHook
-const telegramUrl = "https://api.telegram.org/bot" + botToken;
+const telegramUrl = "https://api.telegram.org/bot" + telegramBotToken;
 const webHookLink = "https://script.google.com/macros/s/" + deploymentId + "/exec";
 
 

@@ -9,7 +9,7 @@ function sendText(chatId, text, keyBoard) {
       reply_markup: JSON.stringify(keyBoard),
     },
   };
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/', data);
+  return UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/', data);
 }
 
 //
@@ -32,10 +32,9 @@ function userExists(userID) {
   var searchRange = sheet.getRange(2, 2, lastRow - 1, lastColumn - 1);
   var rangeValues = searchRange.getValues();
 
-  var person = {}
-
   for (j = 0; j < lastRow - 1; j++) {
     if (rangeValues[j][0] === userID) {
+      const person = {};
       person.chatID = rangeValues[j][0];
       person.room = rangeValues[j][1];
       person.zone = rangeValues[j][2];
@@ -45,10 +44,9 @@ function userExists(userID) {
         bookings.push(rangeValues[j][i])
       }
       person.bookings = bookings
-      break;
+      return person;
     }
   };
-  return person;
 }
 
 // FUNCTION isRoomValid = checks if the chatID already exists, then checks if the input is an alphabat within A to E
@@ -56,7 +54,7 @@ function userExists(userID) {
 // and if room is < 25
 function isRoomValid(content) {
   var room = content.messge.text;
-  if (userExists(content.message.chat.id) === {}) {
+  if (!userExists(content.message.chat.id)) {
     if ('.[A-E][0-9]{3}'.test(room)) { // CHECK REGEX NOT SURE IF CORRECT
       if (parseInt(room.slice(0)) < 5 && parseInt(room.slice(-2)) < 25) {
         return true;
@@ -75,19 +73,11 @@ function register(content) {
   Logger.log(chatID);
   var user = userExists(chatID);
 
-  if (user === {}) {
-    const reply = {
-      chat_id: chatID,
-      text: 'You do not exist yet. ' + '\n\n' +
-      "Let's change that. What is your room number?",
-    };
-    const method = 'sendMessage';
-    var options = {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify(reply),
-    };
-    var response = UrlFetchApp.fetch(telegramUrl + '/' + method, options);
+  if (!user) {
+    const text = 'You do not exist yet. ' + '\n\n' +
+      "Let's change that. What is your room number?";
+    const response = sendText(chatID, text)
+    Logger.log(response);
   } else {
     const reply = {
       chat_id: chatID,
@@ -104,7 +94,7 @@ function register(content) {
       contentType: 'application/json',
       payload: JSON.stringify(reply),
     };
-    const response = UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramToken + '/' + method, options);
+    const response = UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/' + method, options);
   }
 }
 
@@ -113,6 +103,7 @@ function register(content) {
 // if his zone cannot be found, invalid input is triggered
 // if successful, user's new details are returned and prompts user's next step
 function addUser(content) {
+  Logger.log('addUser')
   var userSpreadSheet = SpreadsheetApp.openById(userSheetId);
   var userSheet = userSpreadSheet.getSheetByName('Users');
   var zoneSheet = userSpreadSheet.getSheetByName('Zones');
@@ -203,7 +194,7 @@ function addUser(content) {
     contentType: 'application/json',
     payload: JSON.stringify(reply),
   };
-  var response = UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramToken + '/' + method, options);
+  var response = UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/' + method, options);
 }
 
 // FUNCTION invalid = informs the user that we are unaware of his input.
@@ -219,6 +210,7 @@ function invalid(content) {
     payload: JSON.stringify(reply),
   };
   var response = UrlFetchApp.fetch(telegramUrl + '/' + method, options);
+  Logger.log(response);
 }
 
 function testExist() {
@@ -626,13 +618,11 @@ function viewTime(data) {
 function doPost(e) {
   // parse user data
   var contents = JSON.parse(e.postData.contents);
-  Logger.log(contents);
-
   var idMessage = contents.message.chat.id;
   var text = contents.message.text;
   var firstName = contents.message.from.first_name;
   var userID = contents.message.from.id;
-
+  Logger.log(e.postData.contents)
   if (contents.callback_query) {
     var idCallback = contents.callback_query.message.chat.id;
     var name = contents.callback_query.from.first_name;

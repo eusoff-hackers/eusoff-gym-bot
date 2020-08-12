@@ -4,7 +4,7 @@ To use this, you'll need.
 
 1. [Telegram bot Token](https://core.telegram.org/bots)
 2. [A google account](https://script.google.com/home)
-3. [Spreadsheet IDs](https://developers.google.com/sheets/api/guides/concepts#spreadsheet_id) to the necessary in google sheet format (upload [files from this folder](sheets) to google drive and convert to google sheets files through `File > Save as Google Sheets`)
+3. [Spreadsheet IDs](https://developers.google.com/sheets/api/guides/concepts#spreadsheet_id) to the necessary in google sheet format (upload [files from this folder](sheets) to google drive and convert to google sheets files through `File > Save as Google Sheets`) Furthermore, create an empty spreadsheet to be used as a logsheet for logger!
 
 ## Installation
 

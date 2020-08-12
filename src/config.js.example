@@ -1,0 +1,21 @@
+const userSheetId = "<put user sheet id here>";
+const gymSheetId = "<put gym sheet id here";
+const telegramBotToken = "<put bot token here>";
+const logSheetId = "<put log sheet id here>";
+const deploymentId = "<put webapp id here>"
+
+// Run function setWebHook
+const telegramUrl = "https://api.telegram.org/bot" + botToken;
+const webHookLink = "https://script.google.com/macros/s/" + deploymentId + "/exec";
+
+
+function setWebHook() {
+    const response = UrlFetchApp.fetch(telegramUrl + "/setWebHook?url=" + webHookLink);
+    Logger.log(response.getContentText());
+}
+
+function deleteWebHook() {
+    UrlFetchApp.fetch(telegramUrl + "/deleteWebHook");
+}
+
+Logger = BetterLog.useSpreadsheet(logSheetId); 

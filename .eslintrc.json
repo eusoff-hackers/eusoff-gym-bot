@@ -1,0 +1,25 @@
+{
+  "env": {
+    "es2020": true
+  },
+  "extends": ["standard"],
+  "parserOptions": {
+    "ecmaVersion": 11
+  },
+  "rules": {
+    "no-unused-vars": "off",
+    "no-undef": "off",
+    "space-before-function-paren": "off",
+    "semi": "off",
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ]
+  }
+}

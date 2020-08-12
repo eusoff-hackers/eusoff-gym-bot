@@ -20,6 +20,7 @@
         "exports": "always-multiline",
         "functions": "never"
       }
-    ]
+    ],
+    "no-unmodified-loop-condition": "off"
   }
 }

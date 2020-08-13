@@ -410,9 +410,9 @@ function chooseTime(userid, data) {
   };
 
   if (data.split(' ')[1] === 'morn') {
-    sendText(userid, data.split(" ")[0].split("-")[1] + ' what time?', mornkeyboard)
+    sendText(userid, data.split(' ')[0].split('-')[1] + ' what time?', mornkeyboard)
   } else if (data.split(' ')[1] === 'night') {
-    sendText(userid, data.split(" ")[0].split("-")[1] + ' what time?', nightkeyboard)
+    sendText(userid, data.split(' ')[0].split('-')[1] + ' what time?', nightkeyboard)
   }
 }
 
@@ -421,7 +421,7 @@ function book(userID, data, room) {
   var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
   var bookingdata = bookingrange.getValues();
   var count = 0;
-  var day = Number(data.split(" ")[2]);
+  var day = Number(data.split(' ')[2]);
   // session to search through whether they have booked 2 slots alr
   var start = 1;
   var end = 36;
@@ -441,11 +441,10 @@ function book(userID, data, room) {
     }
   }
 
-
   if (data.split(' ')[0] === 'book-morn') {
     const bookrow = Number(data.split(' ')[1]) * 5 - 4;
     for (i = bookrow; i <= bookrow + 4; i++) {
-      if (bookingdata[i][day] == room) {
+      if (bookingdata[i][day] === room) {
         sendText(userID, 'You have booked this slot previously: ' + bookingdata[0][day] + ' ' + bookingdata[bookrow][0]);
         return;
       } else if (bookingdata[i][day] === '') {
@@ -460,7 +459,7 @@ function book(userID, data, room) {
   } else if (data.split(' ')[0] === 'book-night') {
     const bookrow = Number(data.split(' ')[1]) * 5 + 33;
     for (i = bookrow; i <= bookrow + 4; i++) {
-      if (bookingdata[i][day] == room) {
+      if (bookingdata[i][day] === room) {
         sendText(userID, 'You have booked this slot previously: ' + bookingdata[0][day] + ' ' + bookingdata[bookrow][0]);
         return;
       } else if (bookingdata[i][day] === '') {
@@ -474,7 +473,6 @@ function book(userID, data, room) {
     }
   }
 }
-
 
 function testBook() {
   Logger.log(book('book-morn 4', 3, 'D404'));
@@ -658,9 +656,9 @@ function doPost(e) {
       Logger.log(data.split('-')[1]);
       Logger.log(viewTime(data.split('-')[1]));
       sendText(idCallback, viewTime(data.split('-')[1]));
-    } else if (command == 'eligible') {
+    } else if (command === 'eligible') {
       chooseTime(idCallback, data);
-    } else if (command == 'book') {
+    } else if (command === 'book') {
       Logger.log('room:' + userExists(idCallback).room);
       book(idCallback, data, userExists(idCallback).room);
     }

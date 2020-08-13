@@ -9,7 +9,10 @@ function sendText(chatId, text, keyBoard) {
       reply_markup: JSON.stringify(keyBoard),
     },
   };
-  return UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/', data);
+  return UrlFetchApp.fetch(
+    'https://api.telegram.org/bot' + telegramBotToken + '/',
+    data
+  );
 }
 
 //
@@ -33,7 +36,7 @@ function userExists(userID) {
   var rangeValues = searchRange.getValues();
 
   for (j = 0; j < lastRow - 1; j++) {
-    if (rangeValues[j][0] == userID) {
+    if (rangeValues[j][0] === userID) {
       const person = {};
       person.chatID = rangeValues[j][0];
       person.room = rangeValues[j][1];
@@ -41,14 +44,13 @@ function userExists(userID) {
       person.firstName = rangeValues[j][3];
       var bookings = [];
       for (i = 4; i < lastColumn; i++) {
-        bookings.push(rangeValues[j][i])
+        bookings.push(rangeValues[j][i]);
       }
-      person.bookings = bookings
+      person.bookings = bookings;
       Logger.log(person.firstName);
       return person;
     }
-  };
-  
+  }
 }
 
 // FUNCTION isRoomValid = checks if the chatID already exists, then checks if the input is an alphabat within A to E
@@ -57,7 +59,8 @@ function userExists(userID) {
 function isRoomValid(content) {
   var room = content.messge.text;
   if (!userExists(content.message.chat.id)) {
-    if ('.[A-E][0-9]{3}'.test(room)) { // CHECK REGEX NOT SURE IF CORRECT
+    if ('.[A-E][0-9]{3}'.test(room)) {
+      // CHECK REGEX NOT SURE IF CORRECT
       if (parseInt(room.slice(0)) < 5 && parseInt(room.slice(-2)) < 25) {
         return true;
       }
@@ -76,19 +79,31 @@ function register(content) {
   var user = userExists(chatID);
 
   if (!user) {
-    const text = 'You do not exist yet. ' + '\n\n' +
+    const text =
+      'You do not exist yet. ' +
+      '\n\n' +
       "Let's change that. What is your room number?";
-    const response = sendText(chatID, text)
+    const response = sendText(chatID, text);
     Logger.log(response);
   } else {
     const reply = {
       chat_id: chatID,
-      text: 'Welcome back ' + user.firstName + '!!' + '\n' +
-      'RoomNumber: ' + user.room + '\n' +
-      'Zone: ' + user.zone + '\n\n' +
-      'Would you like to make a booking? /UPDATEHERE' + '\n' +
-      'Would you like to check your bookings? /UPDATEHERE' + '\n' +
-      'Would you like to check the available timeslots? /UPDATEHERE',
+      text:
+        'Welcome back ' +
+        user.firstName +
+        '!!' +
+        '\n' +
+        'RoomNumber: ' +
+        user.room +
+        '\n' +
+        'Zone: ' +
+        user.zone +
+        '\n\n' +
+        'Would you like to make a booking? /UPDATEHERE' +
+        '\n' +
+        'Would you like to check your bookings? /UPDATEHERE' +
+        '\n' +
+        'Would you like to check the available timeslots? /UPDATEHERE',
     };
     const method = 'sendMessage';
     const options = {
@@ -96,7 +111,10 @@ function register(content) {
       contentType: 'application/json',
       payload: JSON.stringify(reply),
     };
-    const response = UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/' + method, options);
+    const response = UrlFetchApp.fetch(
+      'https://api.telegram.org/bot' + telegramBotToken + '/' + method,
+      options
+    );
   }
 }
 
@@ -105,7 +123,7 @@ function register(content) {
 // if his zone cannot be found, invalid input is triggered
 // if successful, user's new details are returned and prompts user's next step
 function addUser(content) {
-  Logger.log('addUser')
+  Logger.log('addUser');
   var userSpreadSheet = SpreadsheetApp.openById(userSheetId);
   var userSheet = userSpreadSheet.getSheetByName('Users');
   var zoneSheet = userSpreadSheet.getSheetByName('Zones');
@@ -180,15 +198,29 @@ function addUser(content) {
     invalid(content);
   }
 
-  userSheet.appendRow(content.message.chat.id, room, zone, content.message.from.first_name);
+  userSheet.appendRow(
+    content.message.chat.id,
+    room,
+    zone,
+    content.message.from.first_name
+  );
 
   var reply = {
     chat_id: content.message.chat.id,
-    text: 'Hello' + content.message.from.first_name + '. You are successfully added to Gymbot.' + '\n\n' +
-    'Please check your details.' + '\n' +
-    'Room: ' + room + '\n' +
-    'Zone: ' + zone + '\n' +
-    'To check your slots use /UPDATEHERE & to book a slot /UPDATEHERE',
+    text:
+      'Hello' +
+      content.message.from.first_name +
+      '. You are successfully added to Gymbot.' +
+      '\n\n' +
+      'Please check your details.' +
+      '\n' +
+      'Room: ' +
+      room +
+      '\n' +
+      'Zone: ' +
+      zone +
+      '\n' +
+      'To check your slots use /UPDATEHERE & to book a slot /UPDATEHERE',
   };
   var method = 'sendMessage';
   var options = {
@@ -196,7 +228,10 @@ function addUser(content) {
     contentType: 'application/json',
     payload: JSON.stringify(reply),
   };
-  var response = UrlFetchApp.fetch('https://api.telegram.org/bot' + telegramBotToken + '/' + method, options);
+  var response = UrlFetchApp.fetch(
+    'https://api.telegram.org/bot' + telegramBotToken + '/' + method,
+    options
+  );
 }
 
 // FUNCTION invalid = informs the user that we are unaware of his input.
@@ -227,81 +262,112 @@ function eligibleSlots(userID) {
   var curruser = userExists(userID);
   Logger.log(curruser.firstName.length);
   if (curruser.firstName.length === 0) {
-    sendText(userID, "Hey there! We couldn't find you in our user database, join us using /signup");
+    sendText(
+      userID,
+      "Hey there! We couldn't find you in our user database, join us using /signup"
+    );
   } else {
     var dkeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Mon 8am-3pm',
-          callback_data: 'eligible-mon morn',
-        }],
-        [{
-          text: 'Thurs 8am-3pm',
-          callback_data: 'eligible-thurs morn',
-        }],
-        [{
-          text: 'Sun 4pm-11pm',
-          callback_data: 'eligible-sun night',
-        }],
+        [
+          {
+            text: 'Mon 8am-3pm',
+            callback_data: 'eligible-mon morn',
+          },
+        ],
+        [
+          {
+            text: 'Thurs 8am-3pm',
+            callback_data: 'eligible-thurs morn',
+          },
+        ],
+        [
+          {
+            text: 'Sun 4pm-11pm',
+            callback_data: 'eligible-sun night',
+          },
+        ],
       ],
     };
 
     var ckeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Mon 4pm-11pm',
-          callback_data: 'eligible-mon night',
-        }],
-        [{
-          text: 'Tues 8am-3pm',
-          callback_data: 'eligible-tues morn',
-        }],
-        [{
-          text: 'Fri 8am-3pm',
-          callback_data: 'eligible-fri morn',
-        }],
-        [{
-          text: 'Sat 4pm-11pm',
-          callback_data: 'eligible-sat night',
-        }],
+        [
+          {
+            text: 'Mon 4pm-11pm',
+            callback_data: 'eligible-mon night',
+          },
+        ],
+        [
+          {
+            text: 'Tues 8am-3pm',
+            callback_data: 'eligible-tues morn',
+          },
+        ],
+        [
+          {
+            text: 'Fri 8am-3pm',
+            callback_data: 'eligible-fri morn',
+          },
+        ],
+        [
+          {
+            text: 'Sat 4pm-11pm',
+            callback_data: 'eligible-sat night',
+          },
+        ],
       ],
     };
 
     var bkeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Wed 4pm-11pm',
-          callback_data: 'eligible-wed night',
-        }],
-        [{
-          text: 'Fri 4pm-11pm',
-          callback_data: 'eligible-fri night',
-        }],
-        [{
-          text: 'Sat 8am-3pm',
-          callback_data: 'eligible-sat morn',
-        }],
+        [
+          {
+            text: 'Wed 4pm-11pm',
+            callback_data: 'eligible-wed night',
+          },
+        ],
+        [
+          {
+            text: 'Fri 4pm-11pm',
+            callback_data: 'eligible-fri night',
+          },
+        ],
+        [
+          {
+            text: 'Sat 8am-3pm',
+            callback_data: 'eligible-sat morn',
+          },
+        ],
       ],
     };
 
     var akeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Tues 4pm-11pm',
-          callback_data: 'eligible-tues night',
-        }],
-        [{
-          text: 'Wed 8am-3pm',
-          callback_data: 'eligible-wed morn',
-        }],
-        [{
-          text: 'Thurs 4pm-11pm',
-          callback_data: 'eligible-thurs night',
-        }],
-        [{
-          text: 'Sun 8am-3pm',
-          callback_data: 'eligible-sun morn',
-        }],
+        [
+          {
+            text: 'Tues 4pm-11pm',
+            callback_data: 'eligible-tues night',
+          },
+        ],
+        [
+          {
+            text: 'Wed 8am-3pm',
+            callback_data: 'eligible-wed morn',
+          },
+        ],
+        [
+          {
+            text: 'Thurs 4pm-11pm',
+            callback_data: 'eligible-thurs night',
+          },
+        ],
+        [
+          {
+            text: 'Sun 8am-3pm',
+            callback_data: 'eligible-sun morn',
+          },
+        ],
       ],
     };
 
@@ -315,11 +381,13 @@ function eligibleSlots(userID) {
     } else {
       sendText(userID, 'Which session?', dkeyboard);
     }
-  };
+  }
 }
 
 function chooseTime(userid, data) {
-  var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
+  var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
+    'Current Week'
+  );
   var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
   var bookingdata = bookingrange.getValues();
   let day;
@@ -342,80 +410,110 @@ function chooseTime(userid, data) {
 
   var mornkeyboard = {
     inline_keyboard: [
-      [{
-        text: '8am-9am',
-        callback_data: 'book-morn 1',
-      }],
-      [{
-        text: '9am-10am',
-        callback_data: 'book-morn 2',
-      }],
-      [{
-        text: '10am-11am',
-        callback_data: 'book-morn 3',
-      }],
-      [{
-        text: '11am-12pm',
-        callback_data: 'book-morn 4',
-      }],
-      [{
-        text: '12pm - 1pm',
-        callback_data: 'book-morn 5',
-      }],
-      [{
-        text: '1pm - 2pm',
-        callback_data: 'book-morn 6',
-      }],
-      [{
-        text: '2pm - 3pm',
-        callback_data: 'book_morn 7',
-      }],
+      [
+        {
+          text: '8am-9am',
+          callback_data: 'book-morn 1',
+        },
+      ],
+      [
+        {
+          text: '9am-10am',
+          callback_data: 'book-morn 2',
+        },
+      ],
+      [
+        {
+          text: '10am-11am',
+          callback_data: 'book-morn 3',
+        },
+      ],
+      [
+        {
+          text: '11am-12pm',
+          callback_data: 'book-morn 4',
+        },
+      ],
+      [
+        {
+          text: '12pm - 1pm',
+          callback_data: 'book-morn 5',
+        },
+      ],
+      [
+        {
+          text: '1pm - 2pm',
+          callback_data: 'book-morn 6',
+        },
+      ],
+      [
+        {
+          text: '2pm - 3pm',
+          callback_data: 'book_morn 7',
+        },
+      ],
     ],
   };
 
   var nightkeyboard = {
     inline_keyboard: [
-      [{
-        text: '4pm-5pm',
-        callback_data: 'book-night 1',
-      }],
-      [{
-        text: '5pm-6pm',
-        callback_data: 'book-night 2',
-      }],
-      [{
-        text: '6pm-7pm',
-        callback_data: 'book-night 3',
-      }],
-      [{
-        text: '7pm-8pm',
-        callback_data: 'book-night 4',
-      }],
-      [{
-        text: '8pm-9pm',
-        callback_data: 'book-night 5',
-      }],
-      [{
-        text: '9pm-10pm',
-        callback_data: 'book-night 6',
-      }],
-      [{
-        text: '10pm-11pm',
-        callback_data: 'book-night 7',
-      }],
+      [
+        {
+          text: '4pm-5pm',
+          callback_data: 'book-night 1',
+        },
+      ],
+      [
+        {
+          text: '5pm-6pm',
+          callback_data: 'book-night 2',
+        },
+      ],
+      [
+        {
+          text: '6pm-7pm',
+          callback_data: 'book-night 3',
+        },
+      ],
+      [
+        {
+          text: '7pm-8pm',
+          callback_data: 'book-night 4',
+        },
+      ],
+      [
+        {
+          text: '8pm-9pm',
+          callback_data: 'book-night 5',
+        },
+      ],
+      [
+        {
+          text: '9pm-10pm',
+          callback_data: 'book-night 6',
+        },
+      ],
+      [
+        {
+          text: '10pm-11pm',
+          callback_data: 'book-night 7',
+        },
+      ],
     ],
   };
 
   if (data.split(' ')[1] === 'morn') {
-    sendText(userid, 'What time?', mornkeyboard)
+    sendText(userid, 'What time?', mornkeyboard);
   } else if (data.split(' ')[1] === 'night') {
-    sendText(userid, 'What time?', nightkeyboard)
+    sendText(userid, 'What time?', nightkeyboard);
   }
   return day;
 }
 
 function book(data, day, room) {
-  var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
+  var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
+    'Current Week'
+  );
   var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
   var bookingdata = bookingrange.getValues();
   var count = 0;
@@ -426,7 +524,7 @@ function book(data, day, room) {
         count += 1;
       }
       if (count >= 2) {
-        return 'You have already booked 2 sessions for this week!'
+        return 'You have already booked 2 sessions for this week!';
       }
     }
   }
@@ -436,9 +534,15 @@ function book(data, day, room) {
     for (i = bookrow; i <= bookrow + 4; i++) {
       if (bookingdata[i][day] === '') {
         bookingsheet.getRange(i, day).setValue(room);
-        return 'Successfully booked ' + bookingdata[0][day] + ' ' + bookingdata[bookrow][0];
-      } else if (i === bookrow + 4) { // reach last cell and still hasnt inserted name
-        return 'That slot is full, try another one';//, mornkeyboard);
+        return (
+          'Successfully booked ' +
+          bookingdata[0][day] +
+          ' ' +
+          bookingdata[bookrow][0]
+        );
+      } else if (i === bookrow + 4) {
+        // reach last cell and still hasnt inserted name
+        return 'That slot is full, try another one'; //, mornkeyboard);
       }
     }
   } else if (data.split(' ')[0] === 'book-night') {
@@ -446,9 +550,15 @@ function book(data, day, room) {
     for (i = bookrow; i <= bookrow + 4; i++) {
       if (bookingdata[i][day] === '') {
         bookingsheet.getRange(i, day).setValue(room);
-        return 'Successfully booked ' + bookingdata[1][day] + ' ' + bookingdata[bookrow][1];
-      } else if (i === bookrow + 4) { // reach last cell and still hasnt inserted name
-        return 'That slot is full, try another one';//, nightkeyboard);
+        return (
+          'Successfully booked ' +
+          bookingdata[1][day] +
+          ' ' +
+          bookingdata[bookrow][1]
+        );
+      } else if (i === bookrow + 4) {
+        // reach last cell and still hasnt inserted name
+        return 'That slot is full, try another one'; //, nightkeyboard);
       }
     }
   }
@@ -465,83 +575,114 @@ function testBook() {
 function view(userID) {
   Logger.log(userID);
   var curruser = userExists(userID);
-  Logger.log(curruser.firstName.length)
+  Logger.log(curruser.firstName.length);
   if (curruser.firstName.length === 0) {
-    sendText(userID, "Hey there! We couldn't find you in our user database, join us using /register");
+    sendText(
+      userID,
+      "Hey there! We couldn't find you in our user database, join us using /register"
+    );
   } else {
     var dkeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Mon 8am-3pm',
-          callback_data: 'view-mon morn',
-        }],
-        [{
-          text: 'Thurs 8am-3pm',
-          callback_data: 'view-thurs morn',
-        }],
-        [{
-          text: 'Sun 4pm-11pm',
-          callback_data: 'view-sun night',
-        }],
+        [
+          {
+            text: 'Mon 8am-3pm',
+            callback_data: 'view-mon morn',
+          },
+        ],
+        [
+          {
+            text: 'Thurs 8am-3pm',
+            callback_data: 'view-thurs morn',
+          },
+        ],
+        [
+          {
+            text: 'Sun 4pm-11pm',
+            callback_data: 'view-sun night',
+          },
+        ],
       ],
     };
 
     var ckeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Mon 4pm-11pm',
-          callback_data: 'view-mon night',
-        }],
-        [{
-          text: 'Tues 8am-3pm',
-          callback_data: 'view-tues morn',
-        }],
-        [{
-          text: 'Fri 8am-3pm',
-          callback_data: 'view-fri morn',
-        }],
-        [{
-          text: 'Sat 4pm-11pm',
-          callback_data: 'view-sat night',
-        }],
+        [
+          {
+            text: 'Mon 4pm-11pm',
+            callback_data: 'view-mon night',
+          },
+        ],
+        [
+          {
+            text: 'Tues 8am-3pm',
+            callback_data: 'view-tues morn',
+          },
+        ],
+        [
+          {
+            text: 'Fri 8am-3pm',
+            callback_data: 'view-fri morn',
+          },
+        ],
+        [
+          {
+            text: 'Sat 4pm-11pm',
+            callback_data: 'view-sat night',
+          },
+        ],
       ],
     };
 
     var bkeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Wed 4pm-11pm',
-          callback_data: 'view-wed night',
-        }],
-        [{
-          text: 'Fri 4pm-11pm',
-          callback_data: 'view-fri night',
-        }],
-        [{
-          text: 'Sat 8am-3pm',
-          callback_data: 'view-sat morn',
-        }],
+        [
+          {
+            text: 'Wed 4pm-11pm',
+            callback_data: 'view-wed night',
+          },
+        ],
+        [
+          {
+            text: 'Fri 4pm-11pm',
+            callback_data: 'view-fri night',
+          },
+        ],
+        [
+          {
+            text: 'Sat 8am-3pm',
+            callback_data: 'view-sat morn',
+          },
+        ],
       ],
     };
 
     var akeyboard = {
       inline_keyboard: [
-        [{
-          text: 'Tues 4pm-11pm',
-          callback_data: 'view-tues night',
-        }],
-        [{
-          text: 'Wed 8am-3pm',
-          callback_data: 'view-wed morn',
-        }],
-        [{
-          text: 'Thurs 4pm-11pm',
-          callback_data: 'view-thurs night',
-        }],
-        [{
-          text: 'Sun 8am-3pm',
-          callback_data: 'view-sun morn',
-        }],
+        [
+          {
+            text: 'Tues 4pm-11pm',
+            callback_data: 'view-tues night',
+          },
+        ],
+        [
+          {
+            text: 'Wed 8am-3pm',
+            callback_data: 'view-wed morn',
+          },
+        ],
+        [
+          {
+            text: 'Thurs 4pm-11pm',
+            callback_data: 'view-thurs night',
+          },
+        ],
+        [
+          {
+            text: 'Sun 8am-3pm',
+            callback_data: 'view-sun morn',
+          },
+        ],
       ],
     };
 
@@ -555,12 +696,14 @@ function view(userID) {
     } else {
       sendText(userID, 'Which session?', dkeyboard);
     }
-  };
+  }
 }
 
 // counts how many of the 5 cells are occupied
 function count(x, y) {
-  var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
+  var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
+    'Current Week'
+  );
   var searchRange = sheet.getRange(x, y, 5);
   var rangeValues = searchRange.getValues();
   var count = 0;
@@ -580,8 +723,8 @@ function countCol(x, y) {
   var day = sheet.getRange(1, y).getValue();
   var result = '';
   for (j = 0; j < 7; j++) {
-    result += count((x + j * 5), y);
-  };
+    result += count(x + j * 5, y);
+  }
 
   return day + '\n' + '---------------------' + '\n' + result;
 }
@@ -622,12 +765,12 @@ function viewTime(data) {
 
 function doPost(e) {
   // parse user data
-  Logger.log(e.postData.contents)
+  Logger.log(e.postData.contents);
   var contents = JSON.parse(e.postData.contents);
-  
+
   Logger.log(2);
   if (contents.callback_query) {
-    Logger.log("found callback");
+    Logger.log('found callback');
     var idCallback = contents.callback_query.message.chat.id;
     var name = contents.callback_query.from.first_name;
     var data = contents.callback_query.data;
@@ -656,7 +799,7 @@ function doPost(e) {
     } else {
       invalid(contents);
     }
-  } 
+  }
 }
 // SIGNUP ANGELA
 

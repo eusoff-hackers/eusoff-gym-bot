@@ -29,11 +29,11 @@ function userExists(userID) {
   var rangeData = sheet.getDataRange();
   var lastColumn = rangeData.getLastColumn();
   var lastRow = rangeData.getLastRow();
-  var searchRange = sheet.getRange(2, 2, lastRow - 1, lastColumn - 1);
+  var searchRange = sheet.getRange(2, 1, lastRow - 1, lastColumn - 1);
   var rangeValues = searchRange.getValues();
 
   for (j = 0; j < lastRow - 1; j++) {
-    if (rangeValues[j][0] === userID) {
+    if (rangeValues[j][0] == userID) {
       const person = {};
       person.chatID = rangeValues[j][0];
       person.room = rangeValues[j][1];
@@ -44,9 +44,11 @@ function userExists(userID) {
         bookings.push(rangeValues[j][i])
       }
       person.bookings = bookings
+      Logger.log(person.firstName);
       return person;
     }
   };
+  
 }
 
 // FUNCTION isRoomValid = checks if the chatID already exists, then checks if the input is an alphabat within A to E
@@ -223,7 +225,8 @@ function testExist() {
 // -----------------------------------------CREATE WQ------------------------------------------------------
 function eligibleSlots(userID) {
   var curruser = userExists(userID);
-  if (Object.getOwnPropertyNames(curruser).length === 0) {
+  Logger.log(curruser.firstName.length);
+  if (curruser.firstName.length === 0) {
     sendText(userID, "Hey there! We couldn't find you in our user database, join us using /signup");
   } else {
     var dkeyboard = {
@@ -460,8 +463,10 @@ function testBook() {
 // -----------------------------------------VIEW BANGYI------------------------------------------------------
 
 function view(userID) {
+  Logger.log(userID);
   var curruser = userExists(userID);
-  if (Object.getOwnPropertyNames(curruser).length === 0) {
+  Logger.log(curruser.firstName.length)
+  if (curruser.firstName.length === 0) {
     sendText(userID, "Hey there! We couldn't find you in our user database, join us using /register");
   } else {
     var dkeyboard = {
@@ -617,35 +622,41 @@ function viewTime(data) {
 
 function doPost(e) {
   // parse user data
-  var contents = JSON.parse(e.postData.contents);
-  var idMessage = contents.message.chat.id;
-  var text = contents.message.text;
-  var firstName = contents.message.from.first_name;
-  var userID = contents.message.from.id;
   Logger.log(e.postData.contents)
+  var contents = JSON.parse(e.postData.contents);
+  
+  Logger.log(2);
   if (contents.callback_query) {
+    Logger.log("found callback");
     var idCallback = contents.callback_query.message.chat.id;
     var name = contents.callback_query.from.first_name;
     var data = contents.callback_query.data;
+    Logger.log(data);
     var command = data.split('-')[0];
     if (command === 'view') {
       Logger.log(data.split('-')[1]);
       Logger.log(viewTime(data.split('-')[1]));
       sendText(idCallback, viewTime(data.split('-')[1]));
     }
-  } else if (text === '/view') {
-    Logger.log('viewing');
-    view(userID);
-  } else if (text === '/register') {
-    register(contents);
-  } else if (text === '/book') {
-    eligibleSlots(userID);
-    sendText(idMessage, book('book-morn 3', 4, 'C206'));
-  } else if (isRoomValid(contents)) {
-    addUser(contents);
-  } else {
-    invalid(contents);
-  }
+  } else if (contents.message) {
+    var idMessage = contents.message.chat.id;
+    var text = contents.message.text;
+    var firstName = contents.message.from.first_name;
+    var userID = contents.message.from.id;
+    if (text === '/view') {
+      Logger.log('userID:' + userID);
+      view(userID);
+    } else if (text === '/register') {
+      register(contents);
+    } else if (text === '/book') {
+      eligibleSlots(userID);
+      sendText(idMessage, book('book-morn 3', 4, 'C206'));
+    } else if (isRoomValid(contents)) {
+      addUser(contents);
+    } else {
+      invalid(contents);
+    }
+  } 
 }
 // SIGNUP ANGELA
 

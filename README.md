@@ -18,7 +18,7 @@ To use this, you'll need.
 3. Enable the [Google Apps Script API](https://script.google.com/home/usersettings)
 4. Then login to Google, `clasp login`
 5. Create the google app, `clasp create --title "Eusoff Gym Bot" --type webapp --rootDir src`
-6. Copy `config.js.example` into `config.js`, replace all placeholder values with your own, except for deployment id.
+6. Copy `confi g.js.example` into `config.js`, replace all placeholder values with your own, except for deployment id.
 7. Deploy it using `clasp deploy` to get the deployment id.
 
    Take note of the deployment id after `Created version x` e.g.

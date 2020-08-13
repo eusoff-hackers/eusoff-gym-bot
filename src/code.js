@@ -35,6 +35,7 @@ function userExists(userID) {
   var searchRange = sheet.getRange(2, 1, lastRow - 1, lastColumn - 1);
   var rangeValues = searchRange.getValues();
 
+  Logger.log(userID);
   for (j = 0; j < lastRow - 1; j++) {
     if (rangeValues[j][0] === userID) {
       const person = {};
@@ -272,19 +273,19 @@ function eligibleSlots(userID) {
         [
           {
             text: 'Mon 8am-3pm',
-            callback_data: 'eligible-mon morn',
+            callback_data: 'eligible-Mon morn',
           },
         ],
         [
           {
             text: 'Thurs 8am-3pm',
-            callback_data: 'eligible-thurs morn',
+            callback_data: 'eligible-Thurs morn',
           },
         ],
         [
           {
             text: 'Sun 4pm-11pm',
-            callback_data: 'eligible-sun night',
+            callback_data: 'eligible-Sun night',
           },
         ],
       ],
@@ -295,25 +296,25 @@ function eligibleSlots(userID) {
         [
           {
             text: 'Mon 4pm-11pm',
-            callback_data: 'eligible-mon night',
+            callback_data: 'eligible-Mon night',
           },
         ],
         [
           {
             text: 'Tues 8am-3pm',
-            callback_data: 'eligible-tues morn',
+            callback_data: 'eligible-Tues morn',
           },
         ],
         [
           {
             text: 'Fri 8am-3pm',
-            callback_data: 'eligible-fri morn',
+            callback_data: 'eligible-Fri morn',
           },
         ],
         [
           {
             text: 'Sat 4pm-11pm',
-            callback_data: 'eligible-sat night',
+            callback_data: 'eligible-Sat night',
           },
         ],
       ],
@@ -324,19 +325,19 @@ function eligibleSlots(userID) {
         [
           {
             text: 'Wed 4pm-11pm',
-            callback_data: 'eligible-wed night',
+            callback_data: 'eligible-Wed night',
           },
         ],
         [
           {
             text: 'Fri 4pm-11pm',
-            callback_data: 'eligible-fri night',
+            callback_data: 'eligible-Fri night',
           },
         ],
         [
           {
             text: 'Sat 8am-3pm',
-            callback_data: 'eligible-sat morn',
+            callback_data: 'eligible-Sat morn',
           },
         ],
       ],
@@ -347,25 +348,25 @@ function eligibleSlots(userID) {
         [
           {
             text: 'Tues 4pm-11pm',
-            callback_data: 'eligible-tues night',
+            callback_data: 'eligible-Tues night',
           },
         ],
         [
           {
             text: 'Wed 8am-3pm',
-            callback_data: 'eligible-wed morn',
+            callback_data: 'eligible-Wed morn',
           },
         ],
         [
           {
             text: 'Thurs 4pm-11pm',
-            callback_data: 'eligible-thurs night',
+            callback_data: 'eligible-Thurs night',
           },
         ],
         [
           {
             text: 'Sun 8am-3pm',
-            callback_data: 'eligible-sun morn',
+            callback_data: 'eligible-Sun morn',
           },
         ],
       ],
@@ -392,19 +393,19 @@ function chooseTime(userid, data) {
   var bookingdata = bookingrange.getValues();
   let day;
 
-  if (data.split(' ')[0] === 'eligible-mon') {
+  if (data.split(' ')[0] === 'eligible-Mon') {
     day = 1;
-  } else if (data.split(' ')[0] === 'eligible-tues') {
+  } else if (data.split(' ')[0] === 'eligible-Tues') {
     day = 2;
-  } else if (data.split(' ')[0] === 'eligible-wed') {
+  } else if (data.split(' ')[0] === 'eligible-Wed') {
     day = 3;
-  } else if (data.split(' ')[0] === 'eligible-thurs') {
+  } else if (data.split(' ')[0] === 'eligible-Thurs') {
     day = 4;
-  } else if (data.split(' ')[0] === 'eligible-fri') {
+  } else if (data.split(' ')[0] === 'eligible-Fri') {
     day = 5;
-  } else if (data.split(' ')[0] === 'eligible-sat') {
+  } else if (data.split(' ')[0] === 'eligible-Sat') {
     day = 6;
-  } else if (data.split(' ')[0] === 'eligible-sun') {
+  } else if (data.split(' ')[0] === 'eligible-Sun') {
     day = 7;
   }
 
@@ -413,43 +414,43 @@ function chooseTime(userid, data) {
       [
         {
           text: '8am-9am',
-          callback_data: 'book-morn 1',
+          callback_data: 'book-morn 1 ' + day,
         },
       ],
       [
         {
           text: '9am-10am',
-          callback_data: 'book-morn 2',
+          callback_data: 'book-morn 2 ' + day,
         },
       ],
       [
         {
           text: '10am-11am',
-          callback_data: 'book-morn 3',
+          callback_data: 'book-morn 3 ' + day,
         },
       ],
       [
         {
           text: '11am-12pm',
-          callback_data: 'book-morn 4',
+          callback_data: 'book-morn 4 ' + day,
         },
       ],
       [
         {
           text: '12pm - 1pm',
-          callback_data: 'book-morn 5',
+          callback_data: 'book-morn 5 ' + day,
         },
       ],
       [
         {
           text: '1pm - 2pm',
-          callback_data: 'book-morn 6',
+          callback_data: 'book-morn 6 ' + day,
         },
       ],
       [
         {
           text: '2pm - 3pm',
-          callback_data: 'book_morn 7',
+          callback_data: 'book-morn 7 ' + day,
         },
       ],
     ],
@@ -460,105 +461,159 @@ function chooseTime(userid, data) {
       [
         {
           text: '4pm-5pm',
-          callback_data: 'book-night 1',
+          callback_data: 'book-night 1 ' + day,
         },
       ],
       [
         {
           text: '5pm-6pm',
-          callback_data: 'book-night 2',
+          callback_data: 'book-night 2 ' + day,
         },
       ],
       [
         {
           text: '6pm-7pm',
-          callback_data: 'book-night 3',
+          callback_data: 'book-night 3 ' + day,
         },
       ],
       [
         {
           text: '7pm-8pm',
-          callback_data: 'book-night 4',
+          callback_data: 'book-night 4 ' + day,
         },
       ],
       [
         {
           text: '8pm-9pm',
-          callback_data: 'book-night 5',
+          callback_data: 'book-night 5 ' + day,
         },
       ],
       [
         {
           text: '9pm-10pm',
-          callback_data: 'book-night 6',
+          callback_data: 'book-night 6 ' + day,
         },
       ],
       [
         {
           text: '10pm-11pm',
-          callback_data: 'book-night 7',
+          callback_data: 'book-night 7 ' + day,
         },
       ],
     ],
   };
 
   if (data.split(' ')[1] === 'morn') {
-    sendText(userid, 'What time?', mornkeyboard);
+    sendText(
+      userid,
+      data.split(' ')[0].split('-')[1] + ' what time?',
+      mornkeyboard
+    );
   } else if (data.split(' ')[1] === 'night') {
-    sendText(userid, 'What time?', nightkeyboard);
+    sendText(
+      userid,
+      data.split(' ')[0].split('-')[1] + ' what time?',
+      nightkeyboard
+    );
   }
-  return day;
 }
 
-function book(data, day, room) {
+function book(userID, data, room) {
   var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
     'Current Week'
   );
   var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
   var bookingdata = bookingrange.getValues();
   var count = 0;
+  var day = Number(data.split(' ')[2]);
+  // session to search through whether they have booked 2 slots alr
+  var start = 1;
+  var end = 36;
 
-  for (i = 0; i < 73; i++) {
-    for (j = 0; j < 8; j++) {
-      if (bookingdata[i][j] === room) {
-        count += 1;
-      }
-      if (count >= 2) {
-        return 'You have already booked 2 sessions for this week!';
-      }
+  if (data.split(' ')[0] === 'book-night') {
+    start = 37;
+    end = 72;
+  }
+
+  for (i = start; i < end; i++) {
+    if (bookingdata[i][day] === room) {
+      count += 1;
+    }
+    if (count >= 2) {
+      sendText(
+        userID,
+        'You have already booked 2 sessions for ' + bookingdata[0][day]
+      );
+      return;
     }
   }
 
   if (data.split(' ')[0] === 'book-morn') {
     const bookrow = Number(data.split(' ')[1]) * 5 - 4;
     for (i = bookrow; i <= bookrow + 4; i++) {
-      if (bookingdata[i][day] === '') {
-        bookingsheet.getRange(i, day).setValue(room);
-        return (
+      if (bookingdata[i][day] === room) {
+        sendText(
+          userID,
+          'You have booked this slot previously: ' +
+          bookingdata[0][day] +
+          ' ' +
+          bookingdata[bookrow][0]
+        );
+        return;
+      } else if (bookingdata[i][day] === '') {
+        bookingsheet.getRange(i + 1, day + 1).setValue(room); // indexing for actual data starts from 1
+        sendText(
+          userID,
           'Successfully booked ' +
           bookingdata[0][day] +
           ' ' +
           bookingdata[bookrow][0]
         );
+        return;
       } else if (i === bookrow + 4) {
         // reach last cell and still hasnt inserted name
-        return 'That slot is full, try another one'; //, mornkeyboard);
+        sendText(
+          userID,
+          bookingdata[0][day] +
+          ' ' +
+          bookingdata[bookrow][0] +
+          ' slot is full, try another one'
+        );
+        return;
       }
     }
   } else if (data.split(' ')[0] === 'book-night') {
     const bookrow = Number(data.split(' ')[1]) * 5 + 33;
     for (i = bookrow; i <= bookrow + 4; i++) {
-      if (bookingdata[i][day] === '') {
-        bookingsheet.getRange(i, day).setValue(room);
-        return (
+      if (bookingdata[i][day] === room) {
+        sendText(
+          userID,
+          'You have booked this slot previously: ' +
+          bookingdata[0][day] +
+          ' ' +
+          bookingdata[bookrow][0]
+        );
+        return;
+      } else if (bookingdata[i][day] === '') {
+        bookingsheet.getRange(i + 1, day + 1).setValue(room); // indexing for actual data starts from 1
+        sendText(
+          userID,
           'Successfully booked ' +
           bookingdata[1][day] +
           ' ' +
           bookingdata[bookrow][1]
         );
+        return;
       } else if (i === bookrow + 4) {
         // reach last cell and still hasnt inserted name
-        return 'That slot is full, try another one'; //, nightkeyboard);
+        sendText(
+          userID,
+          bookingdata[0][day] +
+          ' ' +
+          bookingdata[bookrow][0] +
+          ' slot is full, try another one'
+        );
+        return;
       }
     }
   }
@@ -781,6 +836,11 @@ function doPost(e) {
       // Logger.log(data.split('-')[1]);
       // Logger.log(viewTime(data.split('-')[1]));
       sendText(idCallback, viewTime(data.split('-')[1]));
+    } else if (command === 'eligible') {
+      chooseTime(idCallback, data);
+    } else if (command === 'book') {
+      Logger.log('room:' + userExists(idCallback).room);
+      book(idCallback, data, userExists(idCallback).room);
     }
   } else if (contents.message) {
     var idMessage = contents.message.chat.id;
@@ -794,7 +854,6 @@ function doPost(e) {
       register(contents);
     } else if (text === '/book') {
       eligibleSlots(userID);
-      sendText(idMessage, book('book-morn 3', 4, 'C206'));
     } else if (isRoomValid(contents)) {
       addUser(contents);
     } else {

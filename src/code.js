@@ -259,6 +259,122 @@ function testExist() {
 // have not tested out the code, but logic somewhat there. feel free to use my functions but leave a note if you change anything (if there is bug :O)
 
 // -----------------------------------------CREATE WQ------------------------------------------------------
+function zoneKeyboard(data, zone) {
+  var dkeyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: 'Mon 8am-3pm',
+          callback_data: data + '-mon morn',
+        },
+      ],
+      [
+        {
+          text: 'Thurs 8am-3pm',
+          callback_data: data + '-thurs morn',
+        },
+      ],
+      [
+        {
+          text: 'Sun 4pm-11pm',
+          callback_data: data + '-sun night',
+        },
+      ],
+    ],
+  };
+
+  var ckeyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: 'Mon 4pm-11pm',
+          callback_data: data + '-mon night',
+        },
+      ],
+      [
+        {
+          text: 'Tues 8am-3pm',
+          callback_data: data + '-tues morn',
+        },
+      ],
+      [
+        {
+          text: 'Fri 8am-3pm',
+          callback_data: data + '-fri morn',
+        },
+      ],
+      [
+        {
+          text: 'Sat 4pm-11pm',
+          callback_data: data + '-sat night',
+        },
+      ],
+    ],
+  };
+
+  var bkeyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: 'Wed 4pm-11pm',
+          callback_data: data + '-wed night',
+        },
+      ],
+      [
+        {
+          text: 'Fri 4pm-11pm',
+          callback_data: data + '-fri night',
+        },
+      ],
+      [
+        {
+          text: 'Sat 8am-3pm',
+          callback_data: data + '-sat morn',
+        },
+      ],
+    ],
+  };
+
+  var akeyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: 'Tues 4pm-11pm',
+          callback_data: data + '-tues night',
+        },
+      ],
+      [
+        {
+          text: 'Wed 8am-3pm',
+          callback_data: data + '-wed morn',
+        },
+      ],
+      [
+        {
+          text: 'Thurs 4pm-11pm',
+          callback_data: data + '-thurs night',
+        },
+      ],
+      [
+        {
+          text: 'Sun 8am-3pm',
+          callback_data: data + '-sun morn',
+        },
+      ],
+    ],
+  }
+
+  if (zone === 'A') {
+    return akeyboard;
+  } else if (zone === 'B') {
+    return bkeyboard;
+  } else if (zone === 'C') {
+    return ckeyboard;
+  } else {
+    return dkeyboard;
+  }
+}
+
 function eligibleSlots(userID) {
   var curruser = userExists(userID);
   Logger.log(curruser.firstName.length);
@@ -268,121 +384,9 @@ function eligibleSlots(userID) {
       "Hey there! We couldn't find you in our user database, join us using /signup"
     );
   } else {
-    var dkeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Mon 8am-3pm',
-            callback_data: 'eligible-Mon morn',
-          },
-        ],
-        [
-          {
-            text: 'Thurs 8am-3pm',
-            callback_data: 'eligible-Thurs morn',
-          },
-        ],
-        [
-          {
-            text: 'Sun 4pm-11pm',
-            callback_data: 'eligible-Sun night',
-          },
-        ],
-      ],
-    };
-
-    var ckeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Mon 4pm-11pm',
-            callback_data: 'eligible-Mon night',
-          },
-        ],
-        [
-          {
-            text: 'Tues 8am-3pm',
-            callback_data: 'eligible-Tues morn',
-          },
-        ],
-        [
-          {
-            text: 'Fri 8am-3pm',
-            callback_data: 'eligible-Fri morn',
-          },
-        ],
-        [
-          {
-            text: 'Sat 4pm-11pm',
-            callback_data: 'eligible-Sat night',
-          },
-        ],
-      ],
-    };
-
-    var bkeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Wed 4pm-11pm',
-            callback_data: 'eligible-Wed night',
-          },
-        ],
-        [
-          {
-            text: 'Fri 4pm-11pm',
-            callback_data: 'eligible-Fri night',
-          },
-        ],
-        [
-          {
-            text: 'Sat 8am-3pm',
-            callback_data: 'eligible-Sat morn',
-          },
-        ],
-      ],
-    };
-
-    var akeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Tues 4pm-11pm',
-            callback_data: 'eligible-Tues night',
-          },
-        ],
-        [
-          {
-            text: 'Wed 8am-3pm',
-            callback_data: 'eligible-Wed morn',
-          },
-        ],
-        [
-          {
-            text: 'Thurs 4pm-11pm',
-            callback_data: 'eligible-Thurs night',
-          },
-        ],
-        [
-          {
-            text: 'Sun 8am-3pm',
-            callback_data: 'eligible-Sun morn',
-          },
-        ],
-      ],
-    };
-
-    // mapping zone to available sessions
-    if (curruser.zone === 'A') {
-      sendText(userID, 'Which session?', akeyboard);
-    } else if (curruser.zone === 'B') {
-      sendText(userID, 'Which session?', bkeyboard);
-    } else if (curruser.zone === 'C') {
-      sendText(userID, 'Which session?', ckeyboard);
-    } else {
-      sendText(userID, 'Which session?', dkeyboard);
-    }
+    sendText(userID, "Which session?", zoneKeyboard("eligible", curruser.zone))
   }
+
 }
 
 function chooseTime(userid, data) {
@@ -393,19 +397,19 @@ function chooseTime(userid, data) {
   var bookingdata = bookingrange.getValues();
   let day;
 
-  if (data.split(' ')[0] === 'eligible-Mon') {
+  if (data.split(' ')[0] === 'eligible-mon') {
     day = 1;
-  } else if (data.split(' ')[0] === 'eligible-Tues') {
+  } else if (data.split(' ')[0] === 'eligible-tues') {
     day = 2;
-  } else if (data.split(' ')[0] === 'eligible-Wed') {
+  } else if (data.split(' ')[0] === 'eligible-wed') {
     day = 3;
-  } else if (data.split(' ')[0] === 'eligible-Thurs') {
+  } else if (data.split(' ')[0] === 'eligible-thurs') {
     day = 4;
-  } else if (data.split(' ')[0] === 'eligible-Fri') {
+  } else if (data.split(' ')[0] === 'eligible-fri') {
     day = 5;
-  } else if (data.split(' ')[0] === 'eligible-Sat') {
+  } else if (data.split(' ')[0] === 'eligible-sat') {
     day = 6;
-  } else if (data.split(' ')[0] === 'eligible-Sun') {
+  } else if (data.split(' ')[0] === 'eligible-sun') {
     day = 7;
   }
 
@@ -506,13 +510,13 @@ function chooseTime(userid, data) {
   if (data.split(' ')[1] === 'morn') {
     sendText(
       userid,
-      data.split(' ')[0].split('-')[1] + ' what time?',
+      bookingdata[0][day] + ' what time?',
       mornkeyboard
     );
   } else if (data.split(' ')[1] === 'night') {
     sendText(
       userid,
-      data.split(' ')[0].split('-')[1] + ' what time?',
+      bookingdata[0][day] + ' what time?',
       nightkeyboard
     );
   }
@@ -583,7 +587,7 @@ function book(userID, data, room) {
       }
     }
   } else if (data.split(' ')[0] === 'book-night') {
-    const bookrow = Number(data.split(' ')[1]) * 5 + 33;
+    const bookrow = Number(data.split(' ')[1]) * 5 + 32;
     for (i = bookrow; i <= bookrow + 4; i++) {
       if (bookingdata[i][day] === room) {
         sendText(
@@ -599,9 +603,9 @@ function book(userID, data, room) {
         sendText(
           userID,
           'Successfully booked ' +
-          bookingdata[1][day] +
+          bookingdata[0][day] +
           ' ' +
-          bookingdata[bookrow][1]
+          bookingdata[bookrow][0]
         );
         return;
       } else if (i === bookrow + 4) {
@@ -637,120 +641,7 @@ function view(userID) {
       "Hey there! We couldn't find you in our user database, join us using /register"
     );
   } else {
-    var dkeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Mon 8am-3pm',
-            callback_data: 'view-mon morn',
-          },
-        ],
-        [
-          {
-            text: 'Thurs 8am-3pm',
-            callback_data: 'view-thurs morn',
-          },
-        ],
-        [
-          {
-            text: 'Sun 4pm-11pm',
-            callback_data: 'view-sun night',
-          },
-        ],
-      ],
-    };
-
-    var ckeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Mon 4pm-11pm',
-            callback_data: 'view-mon night',
-          },
-        ],
-        [
-          {
-            text: 'Tues 8am-3pm',
-            callback_data: 'view-tues morn',
-          },
-        ],
-        [
-          {
-            text: 'Fri 8am-3pm',
-            callback_data: 'view-fri morn',
-          },
-        ],
-        [
-          {
-            text: 'Sat 4pm-11pm',
-            callback_data: 'view-sat night',
-          },
-        ],
-      ],
-    };
-
-    var bkeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Wed 4pm-11pm',
-            callback_data: 'view-wed night',
-          },
-        ],
-        [
-          {
-            text: 'Fri 4pm-11pm',
-            callback_data: 'view-fri night',
-          },
-        ],
-        [
-          {
-            text: 'Sat 8am-3pm',
-            callback_data: 'view-sat morn',
-          },
-        ],
-      ],
-    };
-
-    var akeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Tues 4pm-11pm',
-            callback_data: 'view-tues night',
-          },
-        ],
-        [
-          {
-            text: 'Wed 8am-3pm',
-            callback_data: 'view-wed morn',
-          },
-        ],
-        [
-          {
-            text: 'Thurs 4pm-11pm',
-            callback_data: 'view-thurs night',
-          },
-        ],
-        [
-          {
-            text: 'Sun 8am-3pm',
-            callback_data: 'view-sun morn',
-          },
-        ],
-      ],
-    };
-
-    // mapping zone to available sessions
-    if (curruser.zone === 'A') {
-      sendText(userID, 'Which session?', akeyboard);
-    } else if (curruser.zone === 'B') {
-      sendText(userID, 'Which session?', bkeyboard);
-    } else if (curruser.zone === 'C') {
-      sendText(userID, 'Which session?', ckeyboard);
-    } else {
-      sendText(userID, 'Which session?', dkeyboard);
-    }
+    sendText(userID, "Which session?", zoneKeyboard("view", curruser.zone))
   }
 }
 

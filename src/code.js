@@ -27,7 +27,7 @@ function sendText(chatId, text, keyBoard) {
 // else returns an empty {}
 
 function userExists(userID) {
-  Logger.log('userExistsRan');
+  // Logger.log('userExistsRan');
   var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName('Users');
   var rangeData = sheet.getDataRange();
   var lastColumn = rangeData.getLastColumn();
@@ -47,7 +47,7 @@ function userExists(userID) {
         bookings.push(rangeValues[j][i]);
       }
       person.bookings = bookings;
-      Logger.log(person.firstName);
+      // Logger.log(person.firstName);
       return person;
     }
   }
@@ -73,9 +73,9 @@ function isRoomValid(content) {
 // if registered, returns details of individual and prompts individual for next action
 // if not register, prompts user to input room number
 function register(content) {
-  Logger.log('running register');
+  // Logger.log('running register');
   var chatID = content.message.chat.id;
-  Logger.log(chatID);
+  // Logger.log(chatID);
   var user = userExists(chatID);
 
   if (!user) {
@@ -252,7 +252,7 @@ function invalid(content) {
 
 function testExist() {
   userExists(582348636);
-  Logger.log('ranTestExist');
+  // Logger.log('ranTestExist');
 }
 // -----------------------------------------------------SIGNUP ANGELA---------------------------------------------------------------------
 // have not tested out the code, but logic somewhat there. feel free to use my functions but leave a note if you change anything (if there is bug :O)
@@ -565,7 +565,7 @@ function book(data, day, room) {
 }
 
 function testBook() {
-  Logger.log(book('book-morn 4', 3, 'D404'));
+  // Logger.log(book('book-morn 4', 3, 'D404'));
 }
 
 // ----------------------------------------END CREATE WQ-----------------------------------------------
@@ -573,9 +573,9 @@ function testBook() {
 // -----------------------------------------VIEW BANGYI------------------------------------------------------
 
 function view(userID) {
-  Logger.log(userID);
+  // Logger.log(userID);
   var curruser = userExists(userID);
-  Logger.log(curruser.firstName.length);
+  // Logger.log(curruser.firstName.length);
   if (curruser.firstName.length === 0) {
     sendText(
       userID,
@@ -710,7 +710,7 @@ function count(x, y) {
   var time = sheet.getRange(x, 1).getValue();
 
   for (i = 0; i < rangeValues.length; i++) {
-    if (rangeValues[i] !== '') {
+    if (rangeValues[i].toString().length !== 0) {
       count++;
     }
   }
@@ -719,7 +719,9 @@ function count(x, y) {
 
 // compiles counting of column from col x range y
 function countCol(x, y) {
-  var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(' Week');
+  var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
+    'Current Week'
+  );
   var day = sheet.getRange(1, y).getValue();
   var result = '';
   for (j = 0; j < 7; j++) {
@@ -768,17 +770,16 @@ function doPost(e) {
   Logger.log(e.postData.contents);
   var contents = JSON.parse(e.postData.contents);
 
-  Logger.log(2);
   if (contents.callback_query) {
-    Logger.log('found callback');
+    // Logger.log('found callback');
     var idCallback = contents.callback_query.message.chat.id;
     var name = contents.callback_query.from.first_name;
     var data = contents.callback_query.data;
-    Logger.log(data);
+    // Logger.log(data);
     var command = data.split('-')[0];
     if (command === 'view') {
-      Logger.log(data.split('-')[1]);
-      Logger.log(viewTime(data.split('-')[1]));
+      // Logger.log(data.split('-')[1]);
+      // Logger.log(viewTime(data.split('-')[1]));
       sendText(idCallback, viewTime(data.split('-')[1]));
     }
   } else if (contents.message) {
@@ -787,7 +788,7 @@ function doPost(e) {
     var firstName = contents.message.from.first_name;
     var userID = contents.message.from.id;
     if (text === '/view') {
-      Logger.log('userID:' + userID);
+      // Logger.log('userID:' + userID);
       view(userID);
     } else if (text === '/register') {
       register(contents);

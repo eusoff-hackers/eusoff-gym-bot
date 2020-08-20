@@ -111,11 +111,14 @@ function register(id) {
   sendText(id, text);
 }
 
-// FUNCTION addUser = should only be triggered after isRoomValid check
-// uses the user's room input to add user into the google sheet
-// if his zone cannot be found, invalid input is triggered
-// if successful, user's new details are returned and prompts user's next step
-function addUser(content) {
+/*
+ FUNCTION addUser = should only be triggered after isRoomValid check
+ uses the user's room input to add user into the google sheet
+ if his zone cannot be found, invalid input is triggered
+ if successful, user's new details are returned and prompts user's next step
+*/
+
+function addUser(data) {
   Logger.log('addUser');
   var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName("Users");
   var sheet_zone = SpreadsheetApp.openById(userSheetId).getSheetByName("Zones");
@@ -200,28 +203,20 @@ function addUser(content) {
 }
 
 
-// FUNCTION invalid = informs the user that we are unaware of his input.
-function invalid(content) {
-  var reply = {
-    chat_id: content.message.chat.id,
-    text: 'Oops! Looks like you entered an incorrect command.',
-  };
-  var method = 'sendMessage';
-  var options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(reply),
-  };
-  var response = UrlFetchApp.fetch(telegramUrl + '/' + method, options);
-  Logger.log(response);
+/*
+FUNCTION invalid = informs the user that we are unaware of his input.
+*/
+
+function invalid(id) {
+  var text = "Oops! Looks like you entered an incorrect command.";
+  sendText(id, text);
 }
 
 function testExist() {
   userExists(582348636);
   // Logger.log('ranTestExist');
 }
-// -----------------------------------------------------SIGNUP ANGELA---------------------------------------------------------------------
-// have not tested out the code, but logic somewhat there. feel free to use my functions but leave a note if you change anything (if there is bug :O)
+// ---------------------------------------SIGNUP ANGELA---------------------------------------------------------------------
 
 // -----------------------------------------CREATE WQ------------------------------------------------------
 function eligibleSlots(userID) {

@@ -225,7 +225,7 @@ function eligibleSlots(userID) {
   if (curruser.firstName.length === 0) {
     sendText(
       userID,
-      "Hey there! We couldn't find you in our user database, join us using /signup"
+      "Hey there! We couldn't find you in our user database, join us using /register"
     );
   } else {
     var dkeyboard = {
@@ -803,35 +803,20 @@ function doPost(e) {
       book(idCallback, data, userExists(idCallback).room);
     }
   } else if (contents.message) {
-    var idMessage = contents.message.chat.id;
-    var text = contents.message.text;
-    var firstName = contents.message.from.first_name;
-    var userID = contents.message.from.id;
-    if (text === '/view') {
-      // Logger.log('userID:' + userID);
-      view(userID);
-    } else if (text === '/register') {
-      register(contents);
-    } else if (text === '/book') {
-      eligibleSlots(userID);
-    } else if (isRoomValid(contents)) {
-      addUser(contents);
+    var data = JSON.parse(e.postData.contents);
+    var text = data.message.text;
+    var id = data.message.chat.id;
+    
+    if (text == "/register") {
+      register(id);
+    } else if (isValid(data)) {
+      addUser(data);
     } else {
-      invalid(contents);
+      invalid(id);
     }
   }
 }
-// SIGNUP ANGELA
 
-//  } if ( text === "/book@bblk_lounge_bot") {
-//    sendText(id_message,"ok, when would you like to book the lounge", keyBoard);
-//  } else if ( text === "/view") {
-//    sendText(id_message, view());
-//  } else if ( text === "/view@bblk_lounge_bot") {
-//    sendText(id_message, view());
-//  } else {
-//    sendText(id_message, "i dont understand")
-//  }
 
 function doGet(e) {
   deleteWebHook();

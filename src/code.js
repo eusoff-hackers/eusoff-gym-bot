@@ -22,101 +22,93 @@ function sendText(chatId, text, keyBoard) {
 
 // -----------------------------------------SIGNUP ANGELA------------------------------------------------------
 
-// FUNCTION userExists = checks if user exists in google sheets already/
-// if user exists, returns chatID, room, zone, firstName and all booking timings
-// else returns an empty {}
+/*
+ FUNCTION userExists = checks if user exists in google sheets already/
+ if user exists, returns chatID, room, zone, firstName and all booking timings
+ else returns an empty {}
+ */
 
-function userExists(userID) {
-  // Logger.log('userExistsRan');
-  var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName('Users');
+function userExists(id){
+  var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName("Users");
   var rangeData = sheet.getDataRange();
   var lastColumn = rangeData.getLastColumn();
   var lastRow = rangeData.getLastRow();
-  var searchRange = sheet.getRange(2, 1, lastRow - 1, lastColumn - 1);
+  
+  if (lastRow == 1) {
+    return {};
+  } 
+  
+  var searchRange = sheet.getRange(2,1, lastRow-1, lastColumn); 
   var rangeValues = searchRange.getValues();
+  
+  var person = {}  
 
-  Logger.log(userID);
-  for (j = 0; j < lastRow - 1; j++) {
-    if (rangeValues[j][0] === userID) {
-      const person = {};
-      person.chatID = rangeValues[j][0];
-      person.room = rangeValues[j][1];
-      person.zone = rangeValues[j][2];
-      person.firstName = rangeValues[j][3];
-      var bookings = [];
-      for (i = 4; i < lastColumn; i++) {
-        bookings.push(rangeValues[j][i]);
+    for ( j = 0 ; j < lastRow - 1; j++){
+      if(rangeValues[j][0] == id){
+        person["chatID"] = rangeValues[j][0];
+        person["room"] = rangeValues[j][1];
+        person["zone"] = rangeValues[j][2];
+        person["firstName"] = rangeValues[j][3];
+//        var bookings = [];
+//        for (i = 4; i < lastColumn; i++) {
+//          bookings.push(rangeValues[j][i])
+//        }
+//        person["bookings"] = bookings;
+        person["bookings"] = rangeValues[j][4];
+        break;
       }
-      person.bookings = bookings;
-      // Logger.log(person.firstName);
-      return person;
-    }
-  }
+    };
+  return person;
 }
+/*
+FUNCTION isRoomValid = checks if the user is already existing in our database and if room is a valid one
+*/
 
-// FUNCTION isRoomValid = checks if the chatID already exists, then checks if the input is an alphabat within A to E
-// and if floor is < 5
-// and if room is < 25
-function isRoomValid(content) {
-  var room = content.messge.text;
-  if (!userExists(content.message.chat.id)) {
-    if ('.[A-E][0-9]{3}'.test(room)) {
-      // CHECK REGEX NOT SURE IF CORRECT
-      if (parseInt(room.slice(0)) < 5 && parseInt(room.slice(-2)) < 25) {
+function isRoomValid(data) {
+  var room = data.message.text; 
+  var id = data.message.chat.id;
+  var user = userExists(id);
+  
+  if (Object.getOwnPropertyNames(user).length === 0) {
+    var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName('Zones');
+    
+    var searchRange = sheet.getRange(93,1, 497, 2); 
+    var rangeValues = searchRange.getValues();
+   
+    for ( j = 0 ; j < 497; j++) {
+      if(rangeValues[j][0] == room){
         return true;
+        
       }
     }
   }
-  return false;
+  return false; 
 }
 
 // FUNCTION register = checks if the user is already registered
 // if registered, returns details of individual and prompts individual for next action
 // if not register, prompts user to input room number
-function register(content) {
-  // Logger.log('running register');
-  var chatID = content.message.chat.id;
-  // Logger.log(chatID);
-  var user = userExists(chatID);
 
-  if (!user) {
-    const text =
-      'You do not exist yet. ' +
-      '\n\n' +
-      "Let's change that. What is your room number?";
-    const response = sendText(chatID, text);
-    Logger.log(response);
+function register(id) {
+  var user = userExists(id); 
+  var text = "failed";
+  
+  if (Object.getOwnPropertyNames(user).length === 0) {
+    var text = "Welcome to Eusoff Gym Bot. You do not exist in our system yet. Let's change that." + '\n\n' + "<b> What is your room number? </b>";
+    sendText(id, text);
+    text = "Please input in the format: <b> A101 </b>" + "\n" +
+      "Ensure that you key in the correct room number in your first try." + "\n\n" + 
+      "If not, there will be no way to reset the system unless you contact @EusoffHackers, which will take 3 workings days. "+ "\n" +
+      "If you are caught with inputting the wrong room without notifying @EusoffHackers, you will be barred from booking the gym." + "\n\n" +
+      "Let us all do our parts to fight COVID-19 together.";
   } else {
-    const reply = {
-      chat_id: chatID,
-      text:
-        'Welcome back ' +
-        user.firstName +
-        '!!' +
-        '\n' +
-        'RoomNumber: ' +
-        user.room +
-        '\n' +
-        'Zone: ' +
-        user.zone +
-        '\n\n' +
-        'Would you like to make a booking? /UPDATEHERE' +
-        '\n' +
-        'Would you like to check your bookings? /UPDATEHERE' +
-        '\n' +
-        'Would you like to check the available timeslots? /UPDATEHERE',
-    };
-    const method = 'sendMessage';
-    const options = {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify(reply),
-    };
-    const response = UrlFetchApp.fetch(
-      'https://api.telegram.org/bot' + telegramBotToken + '/' + method,
-      options
-    );
-  }
+    var text = "Welcome back " + user['firstName'] + "!!" + '\n\n' +
+      "Your room number is " + user['room'] + " and you are in Zone " + user['zone'] + '.\n\n' +
+      "Would you like to make a booking? /UPDATEHERE" + '\n' +
+      "Would you like to check your bookings? /UPDATEHERE" + '\n' +
+      "Would you like to check the available timeslots? /UPDATEHERE";
+   }
+  sendText(id, text);
 }
 
 // FUNCTION addUser = should only be triggered after isRoomValid check
@@ -125,115 +117,88 @@ function register(content) {
 // if successful, user's new details are returned and prompts user's next step
 function addUser(content) {
   Logger.log('addUser');
-  var userSpreadSheet = SpreadsheetApp.openById(userSheetId);
-  var userSheet = userSpreadSheet.getSheetByName('Users');
-  var zoneSheet = userSpreadSheet.getSheetByName('Zones');
-  var room = content.message.text;
+  var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName("Users");
+  var sheet_zone = SpreadsheetApp.openById(userSheetId).getSheetByName("Zones");
 
-  var block = room.slice(0);
-  var floor = parseInt(room.slice(1));
-  var number = parseInt(room.slice(-2));
-  var zone = '';
+  var searchRange = sheet_zone.getRange(1,1, 87, 10); 
+  var rangeValues = searchRange.getValues();  
+  
+  var room = data.message.text;  
+  var id = data.message.chat.id;
+  var name = data.message.chat.first_name;
+  
+  var block = room.slice(0,1);
+  var floor = parseInt(room.slice(1,2));
+  var number = parseInt(room.slice(-2)) - 1;
+  var zone = "";
 
-  if (block === 'A') {
+  if (block === "A") {
     if (floor === 1) {
-      zone = zoneSheet.getRange(number, 2);
+      zone = rangeValues[number][1];
     } else if (floor === 2) {
-      zone = zoneSheet.getRange(number + 18, 2);
+      zone = rangeValues[number + 18][1];
     } else if (floor === 3) {
-      zone = zoneSheet.getRange(number + 38, 2);
+      zone = rangeValues[number + 38][1];
     } else if (floor === 4) {
-      zone = zoneSheet.getRange(number + 60, 2);
-    } else {
-      invalid(content);
+      zone = rangeValues[number + 60][1];
     }
-  } else if (block === 'B') {
+  } else if (block === "B") {
     if (floor === 1) {
-      zone = zoneSheet.getRange(number + 83, 2);
+      zone = rangeValues[number][3];
     } else if (floor === 2) {
-      zone = zoneSheet.getRange(number + 100, 2);
+      zone = rangeValues[number + 17][3];
     } else if (floor === 3) {
-      zone = zoneSheet.getRange(number + 119, 2);
+      zone = rangeValues[number + 36][3];
     } else if (floor === 4) {
-      zone = zoneSheet.getRange(number + 140, 2);
-    } else {
-      invalid(content);
+      zone = rangeValues[number + 57][3];
     }
-  } else if (block === 'C') {
+  } else if (block === "C") {
     if (floor === 1) {
-      zone = zoneSheet.getRange(number + 162, 2);
+      zone = rangeValues[number][5];
     } else if (floor === 2) {
-      zone = zoneSheet.getRange(number + 181, 2);
+      zone = rangeValues[number + 19][5];
     } else if (floor === 3) {
-      zone = zoneSheet.getRange(number + 202, 2);
+      zone = rangeValues[number + 40][5];
     } else if (floor === 4) {
-      zone = zoneSheet.getRange(number + 225, 2);
-    } else {
-      invalid(content);
+      zone = rangeValues[number + 63][5];
     }
-  } else if (block === 'D') {
+  } else if (block === "D") {
     if (floor === 1) {
-      zone = zoneSheet.getRange(number + 249, 2);
+      zone = rangeValues[number][7];
     } else if (floor === 2) {
-      zone = zoneSheet.getRange(number + 262, 2);
+      zone = rangeValues[number + 18][7];
     } else if (floor === 3) {
-      zone = zoneSheet.getRange(number + 277, 2);
+      zone = rangeValues[number + 38][7];
     } else if (floor === 4) {
-      zone = zoneSheet.getRange(number + 299, 2);
-    } else {
-      invalid(content);
+      zone = rangeValues[number + 60][7];
     }
-  } else if (block === 'E') {
+  } else if (block === "E") {
     if (floor === 1) {
-      zone = zoneSheet.getRange(number + 322, 2);
+      zone = rangeValues[number][9];
     } else if (floor === 2) {
-      zone = zoneSheet.getRange(number + 340, 2);
+      zone = rangeValues[number + 18][9];
     } else if (floor === 3) {
-      zone = zoneSheet.getRange(number + 360, 2);
+      zone = rangeValues[number + 38][9];
     } else if (floor === 4) {
-      zone = zoneSheet.getRange(number + 383, 2);
-    } else {
-      invalid(content);
+      zone = rangeValues[number + 60][9];
     }
-  } else {
-    invalid(content);
   }
-
-  userSheet.appendRow(
-    content.message.chat.id,
-    room,
-    zone,
-    content.message.from.first_name
-  );
-
-  var reply = {
-    chat_id: content.message.chat.id,
-    text:
-      'Hello' +
-      content.message.from.first_name +
-      '. You are successfully added to Gymbot.' +
-      '\n\n' +
-      'Please check your details.' +
-      '\n' +
-      'Room: ' +
-      room +
-      '\n' +
-      'Zone: ' +
-      zone +
-      '\n' +
-      'To check your slots use /UPDATEHERE & to book a slot /UPDATEHERE',
-  };
-  var method = 'sendMessage';
-  var options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(reply),
-  };
-  var response = UrlFetchApp.fetch(
-    'https://api.telegram.org/bot' + telegramBotToken + '/' + method,
-    options
-  );
+  
+  if (zone == "") {
+    invalid(id);
+  } else {
+    sheet.appendRow([id, room, zone, name]);
+    
+    var text = "Hello " + name + "! You are successfully added to Gymbot." + '\n\n'+ 
+      "Please check your details." + '\n' +
+       "Room: " + room + '\n' +
+       "Zone: " + zone + '\n' +
+       "To check your slots use /UPDATEHERE & to book a slot /UPDATEHERE";
+    
+    sendText(id, text);
+  }  
 }
+
 
 // FUNCTION invalid = informs the user that we are unaware of his input.
 function invalid(content) {

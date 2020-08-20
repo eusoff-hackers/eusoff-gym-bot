@@ -809,7 +809,7 @@ function doPost(e) {
     
     if (text == "/register") {
       register(id);
-    } else if (isValid(data)) {
+    } else if (isRoomValid(data)) {
       addUser(data);
     } else {
       invalid(id);

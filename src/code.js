@@ -671,11 +671,46 @@ function viewTime(data) {
 
 // -----------------------------------------VIEW BANGYI END------------------------------------------------------
 
+// function doPost(e) {
+//   // parse user data
+//   Logger.log(e.postData.contents);
+//   var contents = JSON.parse(e.postData.contents);
+
+//   if (contents.callback_query) {
+//     // Logger.log('found callback');
+//     var idCallback = contents.callback_query.message.chat.id;
+//     var name = contents.callback_query.from.first_name;
+//     var data = contents.callback_query.data;
+//     // Logger.log(data);
+//     var command = data.split('-')[0];
+//     if (command === 'view') {
+//       // Logger.log(data.split('-')[1]);
+//       // Logger.log(viewTime(data.split('-')[1]));
+//       sendText(idCallback, viewTime(data.split('-')[1]));
+//     } else if (command === 'eligible') {
+//       chooseTime(idCallback, data);
+//     } else if (command === 'book') {
+//       Logger.log('room:' + userExists(idCallback).room);
+//       book(idCallback, data, userExists(idCallback).room);
+//     }
+//   } else if (contents.message) {
+//     var data = JSON.parse(e.postData.contents);
+//     var text = data.message.text;
+//     var id = data.message.chat.id;
+    
+//     if (text == "/register") {
+//       register(id);
+//     } else if (isRoomValid(data)) {
+//       addUser(data);
+//     } else {
+//       invalid(id);
+//     }
+//   }
+// }
 function doPost(e) {
   // parse user data
   Logger.log(e.postData.contents);
   var contents = JSON.parse(e.postData.contents);
-
   if (contents.callback_query) {
     // Logger.log('found callback');
     var idCallback = contents.callback_query.message.chat.id;
@@ -694,17 +729,24 @@ function doPost(e) {
       book(idCallback, data, userExists(idCallback).room);
     }
   } else if (contents.message) {
-    var data = JSON.parse(e.postData.contents);
-    var text = data.message.text;
-    var id = data.message.chat.id;
-    
-    if (text == "/register") {
-      register(id);
-    } else if (isRoomValid(data)) {
-      addUser(data);
+    var idMessage = contents.message.chat.id;
+    var text = contents.message.text;
+    var firstName = contents.message.from.first_name;
+    var userID = contents.message.from.id;
+
+    if (text === '/view') {
+      // Logger.log('userID:' + userID);
+      view(userID);
+    } else if (text === '/register') {
+      register(userID);
+    } else if (text === '/book') {
+      eligibleSlots(userID);
+      sendText(idMessage, book('book-morn 3', 4, 'C206'));
+    } else if (isRoomValid(contents)) {
+      addUser(contents);
     } else {
-      invalid(id);
-    }
+      invalid(userID);
+    } 
   }
 }
 

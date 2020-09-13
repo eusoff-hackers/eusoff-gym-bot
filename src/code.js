@@ -819,7 +819,7 @@ function doPost(e) {
         sendText(
           idMessage,
           'Which booking do you want to delete?',
-          viewOwn(userID)
+          viewOwn(userId)
         );
       }
     } else if (text === '/start') {

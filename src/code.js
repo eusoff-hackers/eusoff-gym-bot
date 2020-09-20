@@ -261,7 +261,7 @@ function zoneKeyboard(data, zone) {
       ],
       [
         {
-          text: 'Sun 4pm-11pm',
+          text: 'Sun 4pm-3am',
           callback_data: data + '-sun night',
         },
       ],
@@ -272,7 +272,7 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Mon 4pm-11pm',
+          text: 'Mon 4pm-3am',
           callback_data: data + '-mon night',
         },
       ],
@@ -290,7 +290,7 @@ function zoneKeyboard(data, zone) {
       ],
       [
         {
-          text: 'Sat 4pm-11pm',
+          text: 'Sat 4pm-3am',
           callback_data: data + '-sat night',
         },
       ],
@@ -301,13 +301,13 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Wed 4pm-11pm',
+          text: 'Wed 4pm-3am',
           callback_data: data + '-wed night',
         },
       ],
       [
         {
-          text: 'Fri 4pm-11pm',
+          text: 'Fri 4pm-3am',
           callback_data: data + '-fri night',
         },
       ],
@@ -324,7 +324,7 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Tues 4pm-11pm',
+          text: 'Tues 4pm-3am',
           callback_data: data + '-tues night',
         },
       ],
@@ -336,7 +336,7 @@ function zoneKeyboard(data, zone) {
       ],
       [
         {
-          text: 'Thurs 4pm-11pm',
+          text: 'Thurs 4pm-3am',
           callback_data: data + '-thurs night',
         },
       ],
@@ -488,6 +488,30 @@ function chooseTime(userid, data) {
           callback_data: 'book-night 7 ' + day,
         },
       ],
+      [
+        {
+          text: '11pm-12am',
+          callback_data: 'book-night 8 ' + day,
+        },
+      ],
+      [
+        {
+          text: '12am-1am',
+          callback_data: 'book-night 9 ' + day,
+        },
+      ],
+      [
+        {
+          text: '1am-2am',
+          callback_data: 'book-night 10 ' + day,
+        },
+      ],
+      [
+        {
+          text: '2am-3am',
+          callback_data: 'book-night 11 ' + day,
+        },
+      ],
     ],
   };
 
@@ -502,7 +526,7 @@ function book(userID, data, room) {
   var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
     'Current Week'
   );
-  var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
+  var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
   var bookingdata = bookingrange.getValues();
   var count = 0;
   var day = Number(data.split(' ')[2]);
@@ -512,7 +536,7 @@ function book(userID, data, room) {
 
   if (data.split(' ')[0] === 'book-night') {
     start = 37;
-    end = 72;
+    end = 92;
   }
 
   for (i = start; i < end; i++) {
@@ -611,12 +635,12 @@ function viewOwn(userID) {
   var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
     'Current Week'
   );
-  var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
+  var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
   var bookingdata = bookingrange.getValues();
   var count = 0;
   var keyboard = [];
   for (i = 0; i < 8; i++) {
-    for (j = 0; j < 73; j++) {
+    for (j = 0; j < 93; j++) {
       if (bookingdata[j][i] === room) {
         keyboard[count] = [
           {
@@ -690,13 +714,13 @@ function count(x, y) {
 }
 
 // compiles counting of column from col x range y
-function countCol(x, y) {
+function countCol(x, y, z) {
   var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
     'Current Week'
   );
   var day = sheet.getRange(1, y).getValue();
   var result = '';
-  for (j = 0; j < 7; j++) {
+  for (j = 0; j < z; j++) {
     result += count(x + j * 5, y);
   }
 
@@ -705,33 +729,33 @@ function countCol(x, y) {
 
 function viewTime(data) {
   if (data === 'mon morn') {
-    return countCol(2, 2);
+    return countCol(2, 2, 7);
   } else if (data === 'mon night') {
-    return countCol(38, 2);
+    return countCol(38, 2, 11);
   } else if (data === 'tues morn') {
-    return countCol(2, 3);
+    return countCol(2, 3, 7);
   } else if (data === 'tues night') {
-    return countCol(38, 3);
+    return countCol(38, 3, 11);
   } else if (data === 'wed morn') {
-    return countCol(2, 4);
+    return countCol(2, 4, 7);
   } else if (data === 'wed night') {
-    return countCol(38, 4);
+    return countCol(38, 4, 11);
   } else if (data === 'thurs morn') {
-    return countCol(2, 5);
+    return countCol(2, 5, 7);
   } else if (data === 'thurs night') {
-    return countCol(38, 5);
+    return countCol(38, 5, 11);
   } else if (data === 'fri morn') {
-    return countCol(2, 6);
+    return countCol(2, 6, 7);
   } else if (data === 'fri night') {
-    return countCol(38, 6);
+    return countCol(38, 6, 11);
   } else if (data === 'sat morn') {
-    return countCol(2, 7);
+    return countCol(2, 7, 7);
   } else if (data === 'sat night') {
-    return countCol(38, 7);
+    return countCol(38, 7, 11);
   } else if (data === 'sun morn') {
-    return countCol(2, 8);
+    return countCol(2, 8, 7);
   } else if (data === 'sun night') {
-    return countCol(38, 8);
+    return countCol(38, 8, 11);
   }
 }
 

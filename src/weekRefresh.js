@@ -1,6 +1,6 @@
 function weekRefresh() {
   
-    var sheet = SpreadsheetApp.openById("1DpjcLNgY4cK1z3oQpqc8nesdNNjezkwwLCCnWIHrdPA");
+    var sheet = SpreadsheetApp.openById(gymSheetId);
     var originSheet = sheet.getSheetByName("Current Week");
     var tz = sheet.getSpreadsheetTimeZone();
   

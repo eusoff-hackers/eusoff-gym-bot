@@ -778,7 +778,7 @@ function deleteBooking(col, row, userID) {
   );
   var curruser = userExists(userID);
   var room = curruser.room;
-  Logger.log(row, col);
+  // Logger.log(row, col);
   // Logger.log(bookingsheet.getRange(row,col).getValue());
   // if (row < 78) {
   if (room === bookingsheet.getRange(row, col).getValue()) {

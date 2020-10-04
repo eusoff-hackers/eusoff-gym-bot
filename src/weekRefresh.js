@@ -59,6 +59,13 @@ function weekRefresh() {
       tz,
       'MM/dd'
     );
+  var nextMonday =
+    'Monday ' +
+    Utilities.formatDate(
+      new Date(today.getTime() + 24 * 60 * 60 * 1000 * 8),
+      tz,
+      'MM/dd'
+    );
 
   // Copying past weeks data to new sheet and naming it the Monday of that week
   destinationSheet = originSheet.copyTo(sheet);
@@ -73,4 +80,6 @@ function weekRefresh() {
   originSheet.getRange('F1').setValue(friday);
   originSheet.getRange('G1').setValue(saturday);
   originSheet.getRange('H1').setValue(sunday);
+  originSheet.getRange('I1').setValue(nextMonday);
+  originSheet.getRange('I1').setFontColor('white');
 }

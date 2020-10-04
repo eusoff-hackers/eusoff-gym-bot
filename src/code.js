@@ -249,20 +249,20 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Mon 8am-3pm',
-          callback_data: data + '-mon morn',
+          text: 'Mon 12am-3am',
+          callback_data: data + '-mon midnight',
         },
       ],
       [
         {
-          text: 'Thurs 8am-3pm',
-          callback_data: data + '-thurs morn',
+          text: 'Wed 12am-3am',
+          callback_data: data + '-wed midnight',
         },
       ],
       [
         {
-          text: 'Sun 4pm-3am',
-          callback_data: data + '-sun night',
+          text: 'Fri 12am-3am',
+          callback_data: data + '-fri midnight',
         },
       ],
     ],
@@ -272,8 +272,20 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Mon 4pm-3am',
+          text: 'Mon 8am-3pm',
+          callback_data: data + '-mon morn',
+        },
+      ],
+      [
+        {
+          text: 'Mon 4pm-12am',
           callback_data: data + '-mon night',
+        },
+      ],
+      [
+        {
+          text: 'Tues 12am-3am',
+          callback_data: data + '-tues midnight',
         },
       ],
       [
@@ -290,8 +302,14 @@ function zoneKeyboard(data, zone) {
       ],
       [
         {
-          text: 'Sat 4pm-3am',
+          text: 'Sat 4pm-12am',
           callback_data: data + '-sat night',
+        },
+      ],
+      [
+        {
+          text: 'Sun 12am-3am',
+          callback_data: data + '-sun midnight',
         },
       ],
     ],
@@ -301,14 +319,26 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Wed 4pm-3am',
+          text: 'Wed 4pm-12am',
           callback_data: data + '-wed night',
         },
       ],
       [
         {
-          text: 'Fri 4pm-3am',
+          text: 'Thurs 12am-3am',
+          callback_data: data + '-thurs midnight',
+        },
+      ],
+      [
+        {
+          text: 'Fri 4pm-12am',
           callback_data: data + '-fri night',
+        },
+      ],
+      [
+        {
+          text: 'Sat 12am-3am',
+          callback_data: data + '-sat midnight',
         },
       ],
       [
@@ -324,7 +354,7 @@ function zoneKeyboard(data, zone) {
     inline_keyboard: [
       [
         {
-          text: 'Tues 4pm-3am',
+          text: 'Tues 4pm-12am',
           callback_data: data + '-tues night',
         },
       ],
@@ -336,7 +366,13 @@ function zoneKeyboard(data, zone) {
       ],
       [
         {
-          text: 'Thurs 4pm-3am',
+          text: 'Thurs 8am-3pm',
+          callback_data: data + '-thurs morn',
+        },
+      ],
+      [
+        {
+          text: 'Thurs 4pm-12am',
           callback_data: data + '-thurs night',
         },
       ],
@@ -344,6 +380,12 @@ function zoneKeyboard(data, zone) {
         {
           text: 'Sun 8am-3pm',
           callback_data: data + '-sun morn',
+        },
+      ],
+      [
+        {
+          text: 'Sun 4pm-12am',
+          callback_data: data + '-sun night',
         },
       ],
     ],
@@ -377,7 +419,7 @@ function chooseTime(userid, data) {
   var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
     'Current Week'
   );
-  var bookingrange = bookingsheet.getRange(1, 1, 73, 8);
+  var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
   var bookingdata = bookingrange.getValues();
   let day;
 
@@ -494,22 +536,27 @@ function chooseTime(userid, data) {
           callback_data: 'book-night 8 ' + day,
         },
       ],
+    ],
+  };
+
+  var midnightkeyboard = {
+    inline_keyboard: [
       [
         {
           text: '12am-1am',
-          callback_data: 'book-night 9 ' + day,
+          callback_data: 'book-midnight 1 ' + day,
         },
       ],
       [
         {
           text: '1am-2am',
-          callback_data: 'book-night 10 ' + day,
+          callback_data: 'book-midnight 2 ' + day,
         },
       ],
       [
         {
           text: '2am-3am',
-          callback_data: 'book-night 11 ' + day,
+          callback_data: 'book-midnight 3 ' + day,
         },
       ],
     ],
@@ -519,6 +566,8 @@ function chooseTime(userid, data) {
     sendText(userid, bookingdata[0][day] + ' what time?', mornkeyboard);
   } else if (data.split(' ')[1] === 'night') {
     sendText(userid, bookingdata[0][day] + ' what time?', nightkeyboard);
+  } else if (data.split(' ')[1] === 'midnight') {
+    sendText(userid, bookingdata[0][day] + ' what time?', midnightkeyboard);
   }
 }
 
@@ -530,25 +579,37 @@ function book(userID, data, room) {
   var bookingdata = bookingrange.getValues();
   var count = 0;
   var day = Number(data.split(' ')[2]);
-  // session to search through whether they have booked 2 slots alr
-  var start = 1;
-  var end = 36;
+  var prevDay = day - 1;
 
-  if (data.split(' ')[0] === 'book-night') {
-    start = 37;
-    end = 92;
+  if (day === 1) {
+    prevDay = 7;
   }
 
-  for (i = start; i < end; i++) {
+  // search through morn and night session
+  for (i = 1; i < 77; i++) {
     if (bookingdata[i][day] === room) {
       count += 1;
+      if (count >= 2) {
+        sendText(
+          userID,
+          'You have already booked 2 sessions for ' + bookingdata[0][day]
+        );
+        return;
+      }
     }
-    if (count >= 2) {
-      sendText(
-        userID,
-        'You have already booked 2 sessions for ' + bookingdata[0][day]
-      );
-      return;
+  }
+
+  // search through midnight session, in previous column
+  for (i = 77; i < 92; i++) {
+    if (bookingdata[i][prevDay] === room) {
+      count += 1;
+      if (count >= 2) {
+        sendText(
+          userID,
+          'You have already booked 2 sessions for ' + bookingdata[0][day]
+        );
+        return;
+      }
     }
   }
 
@@ -620,6 +681,40 @@ function book(userID, data, room) {
         return;
       }
     }
+  } else if (data.split(' ')[0] === 'book-midnight') {
+    const bookrow = Number(data.split(' ')[1]) * 5 + 72;
+    for (i = bookrow; i <= bookrow + 4; i++) {
+      if (bookingdata[i][prevDay] === room) {
+        sendText(
+          userID,
+          'You have booked this slot previously: ' +
+            bookingdata[0][day] +
+            ' ' +
+            bookingdata[bookrow][0]
+        );
+        return;
+      } else if (bookingdata[i][prevDay] === '') {
+        bookingsheet.getRange(i + 1, prevDay + 1).setValue(room); // indexing for actual data starts from 1
+        sendText(
+          userID,
+          'Successfully booked ' +
+            bookingdata[0][day] +
+            ' ' +
+            bookingdata[bookrow][0]
+        );
+        return;
+      } else if (i === bookrow + 4) {
+        // reach last cell and still hasnt inserted name
+        sendText(
+          userID,
+          bookingdata[0][day] +
+            ' ' +
+            bookingdata[bookrow][0] +
+            ' slot is full, try another one'
+        );
+        return;
+      }
+    }
   }
 }
 
@@ -639,12 +734,27 @@ function viewOwn(userID) {
   var bookingdata = bookingrange.getValues();
   var count = 0;
   var keyboard = [];
+
   for (i = 0; i < 8; i++) {
-    for (j = 0; j < 93; j++) {
+    for (j = 0; j < 77; j++) {
       if (bookingdata[j][i] === room) {
         keyboard[count] = [
           {
             text: bookingdata[0][i] + ' ' + bookingdata[j][0],
+            callback_data: 'delete-' + (i + 1) + '-' + (j + 1),
+          },
+        ];
+        count++;
+      }
+    }
+  }
+
+  for (i = 0; i < 8; i++) {
+    for (j = 77; j < 92; j++) {
+      if (bookingdata[j][i] === room) {
+        keyboard[count] = [
+          {
+            text: bookingdata[0][i + 1] + ' ' + bookingdata[j][0],
             callback_data: 'delete-' + (i + 1) + '-' + (j + 1),
           },
         ];
@@ -668,14 +778,23 @@ function deleteBooking(col, row, userID) {
   );
   var curruser = userExists(userID);
   var room = curruser.room;
-  // Logger.log(row, col);
+  Logger.log(row, col);
   // Logger.log(bookingsheet.getRange(row,col).getValue());
+  // if (row < 78) {
   if (room === bookingsheet.getRange(row, col).getValue()) {
     bookingsheet.getRange(row, col).clearContent();
     return 'Booking deleted!';
   } else {
     return 'You have no bookings for this day!';
   }
+  // } else {
+  //   if (room === bookingsheet.getRange(row, Number(col) - 1).getValue()) {
+  //     bookingsheet.getRange(row, col).clearContent();
+  //     return 'Booking deleted!';
+  //   } else {
+  //     return 'You have no bookings for this day!';
+  //   }
+  // }
 }
 
 // ----------------------------------------DELETE FUNCTION-----------------------------------------------
@@ -731,31 +850,45 @@ function viewTime(data) {
   if (data === 'mon morn') {
     return countCol(2, 2, 7);
   } else if (data === 'mon night') {
-    return countCol(38, 2, 11);
+    return countCol(38, 2, 8);
+  } else if (data === 'tues midnight') {
+    return countCol(78, 2, 3);
   } else if (data === 'tues morn') {
     return countCol(2, 3, 7);
   } else if (data === 'tues night') {
-    return countCol(38, 3, 11);
+    return countCol(38, 3, 8);
+  } else if (data === 'wed midnight') {
+    return countCol(78, 3, 3);
   } else if (data === 'wed morn') {
     return countCol(2, 4, 7);
   } else if (data === 'wed night') {
-    return countCol(38, 4, 11);
+    return countCol(38, 4, 8);
+  } else if (data === 'thurs midnight') {
+    return countCol(78, 4, 3);
   } else if (data === 'thurs morn') {
     return countCol(2, 5, 7);
   } else if (data === 'thurs night') {
-    return countCol(38, 5, 11);
+    return countCol(38, 5, 8);
+  } else if (data === 'fri midnight') {
+    return countCol(78, 5, 3);
   } else if (data === 'fri morn') {
     return countCol(2, 6, 7);
   } else if (data === 'fri night') {
-    return countCol(38, 6, 11);
+    return countCol(38, 6, 8);
+  } else if (data === 'sat midnight') {
+    return countCol(78, 6, 3);
   } else if (data === 'sat morn') {
     return countCol(2, 7, 7);
   } else if (data === 'sat night') {
-    return countCol(38, 7, 11);
+    return countCol(38, 7, 8);
+  } else if (data === 'sun midnight') {
+    return countCol(78, 7, 3);
   } else if (data === 'sun morn') {
     return countCol(2, 8, 7);
   } else if (data === 'sun night') {
-    return countCol(38, 8, 11);
+    return countCol(38, 8, 8);
+  } else if (data === 'mon midnight') {
+    return countCol(78, 8, 3);
   }
 }
 

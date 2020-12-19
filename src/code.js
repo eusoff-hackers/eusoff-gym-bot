@@ -288,7 +288,7 @@ function sendText(chatId, text, keyBoard) {
           );
           return;
         } else if (bookingdata[i][day] === '') {
-          bookingsheet.getRange(i + 2, day + 1).setValue(room); // indexing for actual data starts from 1
+          bookingsheet.getRange(i + 1, day + 1).setValue(room); // indexing for actual data starts from 1
           sendText(
             userID,
             'Successfully booked ' +
@@ -320,34 +320,23 @@ function sendText(chatId, text, keyBoard) {
   function viewOwn(userID) {
     var curruser = userExists(userID);
     var room = curruser.room;
-    var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
-      'Current Week'
-    );
+    var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
     var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
     var bookingdata = bookingrange.getValues();
     var count = 0;
     var keyboard = [];
   
     for (i = 0; i < 8; i++) {
-      for (j = 0; j < 77; j++) {
+      for (j = 0; j < 91; j++) {
         if (bookingdata[j][i] === room) {
+            var rem = (j%5 - 1);
+            if (rem == -1) {
+                rem = 4;
+            }
+            var timerow = j - rem;
           keyboard[count] = [
             {
-              text: bookingdata[0][i] + ' ' + bookingdata[j][0],
-              callback_data: 'delete-' + (i + 1) + '-' + (j + 1),
-            },
-          ];
-          count++;
-        }
-      }
-    }
-  
-    for (i = 0; i < 8; i++) {
-      for (j = 77; j < 92; j++) {
-        if (bookingdata[j][i] === room) {
-          keyboard[count] = [
-            {
-              text: bookingdata[0][i + 1] + ' ' + bookingdata[j][0],
+              text: bookingdata[0][i] + ' ' + bookingdata[timerow][0],
               callback_data: 'delete-' + (i + 1) + '-' + (j + 1),
             },
           ];
@@ -366,28 +355,17 @@ function sendText(chatId, text, keyBoard) {
     }
   }
   function deleteBooking(col, row, userID) {
-    var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
-      'Current Week'
-    );
+    var bookingsheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
     var curruser = userExists(userID);
     var room = curruser.room;
     // Logger.log(row, col);
     // Logger.log(bookingsheet.getRange(row,col).getValue());
-    // if (row < 78) {
     if (room === bookingsheet.getRange(row, col).getValue()) {
       bookingsheet.getRange(row, col).clearContent();
       return 'Booking deleted!';
     } else {
       return 'You have no bookings for this day!';
     }
-    // } else {
-    //   if (room === bookingsheet.getRange(row, Number(col) - 1).getValue()) {
-    //     bookingsheet.getRange(row, col).clearContent();
-    //     return 'Booking deleted!';
-    //   } else {
-    //     return 'You have no bookings for this day!';
-    //   }
-    // }
   }
   
   // ----------------------------------------DELETE FUNCTION-----------------------------------------------
@@ -527,7 +505,7 @@ function sendText(chatId, text, keyBoard) {
       } else if (text === '/book') {
         eligibleSlots(userId);
       } else if (text === '/delete') {
-        if (viewOwn(userId) === false) {
+        if (!viewOwn(userId)) {
           sendText(idMessage, 'You have no bookings to delete');
         } else {
           sendText(

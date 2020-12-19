@@ -245,7 +245,6 @@ function sendText(chatId, text, keyBoard) {
     var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
     var bookingdata = bookingrange.getValues();
     var count = 0;
-    sendText(1165718697, data);
     var day = Number(data.split(' ')[2]);
     var prevDay = day - 1;
   
@@ -277,7 +276,6 @@ function sendText(chatId, text, keyBoard) {
 
     var day = Number(data.split(' ')[1]) + 1;
     var bookrow = Number(data.split(' ')[2]);
-    sendText(1165718697, day + bookrow);
 
     for (i = bookrow*5 + 1; i <= bookrow*5 + 5; i++) {
         if (bookingdata[i][day] === room) {
@@ -290,7 +288,7 @@ function sendText(chatId, text, keyBoard) {
           );
           return;
         } else if (bookingdata[i][day] === '') {
-          bookingsheet.getRange(i + 1, day + 1).setValue(room); // indexing for actual data starts from 1
+          bookingsheet.getRange(i + 2, day + 1).setValue(room); // indexing for actual data starts from 1
           sendText(
             userID,
             'Successfully booked ' +

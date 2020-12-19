@@ -188,11 +188,6 @@ function sendText(chatId, text, keyBoard) {
     var text = 'Oops! Looks like you entered an incorrect command.';
     sendText(id, text);
   }
-  
-  function testExist() {
-    userExists(582348636);
-    // Logger.log('ranTestExist');
-  }
   // ---------------------------------------SIGNUP ANGELA---------------------------------------------------------------------
   
   // -----------------------------------------CREATE WQ------------------------------------------------------
@@ -209,8 +204,6 @@ function sendText(chatId, text, keyBoard) {
     }    
     return {inline_keyboard: keyboard};
   }
-  
-
   
   function eligibleSlots(userID) {
     var curruser = userExists(userID);
@@ -237,7 +230,7 @@ function sendText(chatId, text, keyBoard) {
         ];
     }
 
-    sendText(userID, bookingdata[0][data.split(' ')[1] + 1] + ' what time?', {inline_keyboard: keyboard});
+    sendText(userID, bookingdata[0][Number(data.split(' ')[1]) + 1] + ' what time?', {inline_keyboard: keyboard});
   }
   
   function book(userID, data, room) {
@@ -245,46 +238,27 @@ function sendText(chatId, text, keyBoard) {
     var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
     var bookingdata = bookingrange.getValues();
     var count = 0;
-    var day = Number(data.split(' ')[2]);
-    var prevDay = day - 1;
-  
-    if (day === 1) {
-      prevDay = 7;
-    }
-  
-    // search through morn and night session
-    for (i = 1; i < 77; i++) {
+    var day = Number(data.split(' ')[1]) + 1;
+    var bookrow = Number(data.split(' ')[2])*5 + 1;
+    
+    for (i = 0; i < 91; i++) {
       if (bookingdata[i][day] === room) {
-        count += 1;
+        count++;
         if (count >= 2) {
           sendText(userID, 'You have already booked 2 sessions for ' + bookingdata[0][day]);
           return;
         }
       }
     }
-  
-    // search through midnight session, in previous column
-    for (i = 77; i < 92; i++) {
-      if (bookingdata[i][prevDay] === room) {
-        count += 1;
-        if (count >= 2) {
-            sendText(userID, 'You have already booked 2 sessions for ' + bookingdata[0][day]);
-          return;
-        }
-      }
-    }
 
-    var day = Number(data.split(' ')[1]) + 1;
-    var bookrow = Number(data.split(' ')[2]);
-
-    for (i = bookrow*5 + 1; i <= bookrow*5 + 5; i++) {
+    for (i = bookrow; i <= bookrow + 4; i++) {
         if (bookingdata[i][day] === room) {
           sendText(
             userID,
             'You have booked this slot previously: ' +
               bookingdata[0][day] +
               ' ' +
-              bookingdata[bookrow*5 + 1][0]
+              bookingdata[bookrow][0]
           );
           return;
         } else if (bookingdata[i][day] === '') {
@@ -294,25 +268,21 @@ function sendText(chatId, text, keyBoard) {
             'Successfully booked ' +
               bookingdata[0][day] +
               ' ' +
-              bookingdata[bookrow*5 + 1][0]
+              bookingdata[bookrow][0]
           );
           return;
-        } else if (i === bookrow*5 + 5) {
+        } else if (i === bookrow + 4) {
           // reach last cell and still hasnt inserted name
           sendText(
             userID,
             bookingdata[0][day] +
               ' ' +
-              bookingdata[bookrow*5 + 1][0] +
+              bookingdata[bookrow][0] +
               ' slot is full, try another one'
           );
           return;
         }
       }
-  }
-  
-  function testBook() {
-    // Logger.log(book('book-morn 4', 3, 'D404'));
   }
   
   // ----------------------------------------END CREATE WQ-----------------------------------------------
@@ -330,7 +300,7 @@ function sendText(chatId, text, keyBoard) {
       for (j = 0; j < 91; j++) {
         if (bookingdata[j][i] === room) {
             var rem = (j%5 - 1);
-            if (rem == -1) {
+            if (rem === -1) {
                 rem = 4;
             }
             var timerow = j - rem;
@@ -535,4 +505,3 @@ function doGet(e) {
     }
     return HtmlService.createHtmlOutput('<p>webhook set!</p>');
 }
-  

@@ -13,16 +13,11 @@ function sendText(chatId, text, keyBoard) {
       'https://api.telegram.org/bot' + telegramBotToken + '/',
       data
     );
-  }
+}
 
-  var times = ['8am-9am', '9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm',
-  '4pm-5pm', '5pm-6pm', '6pm-7pm', '7pm-8pm', '8pm-9pm', '9pm-10pm', '10pm-11pm', 
-  '11pm-12am', '12am-1am', '1am-2am', '2am-3am'];
-  
-  //
-  // function flatten(arrayOfArrays) {
-  //  return [].concat.apply([], arrayOfArrays);
-  // }
+var times = ['8am-9am', '9am-10am', '10am-11am', '11am-12pm', '12pm-1pm', '1pm-2pm', '2pm-3pm',
+             '4pm-5pm', '5pm-6pm', '6pm-7pm', '7pm-8pm', '8pm-9pm', '9pm-10pm', '10pm-11pm', 
+             '11pm-12am', '12am-1am', '1am-2am', '2am-3am'];
   
   // -----------------------------------------SIGNUP ANGELA------------------------------------------------------
   
@@ -53,11 +48,6 @@ function sendText(chatId, text, keyBoard) {
         person.room = rangeValues[j][1];
         person.zone = rangeValues[j][2];
         person.firstName = rangeValues[j][3];
-        //        var bookings = [];
-        //        for (i = 4; i < lastColumn; i++) {
-        //          bookings.push(rangeValues[j][i])
-        //        }
-        //        person["bookings"] = bookings;
         person.bookings = rangeValues[j][4];
         break;
       }
@@ -76,10 +66,10 @@ function sendText(chatId, text, keyBoard) {
     if (Object.getOwnPropertyNames(user).length === 0) {
       var sheet = SpreadsheetApp.openById(userSheetId).getSheetByName('Zones');
   
-      var searchRange = sheet.getRange(93, 1, 497, 2);
+      var searchRange = sheet.getRange(1, 1, 405, 2);
       var rangeValues = searchRange.getValues();
   
-      for (j = 0; j < 497; j++) {
+      for (j = 0; j < 405; j++) {
         if (rangeValues[j][0] === room) {
           return true;
         }
@@ -201,7 +191,7 @@ function sendText(chatId, text, keyBoard) {
                 callback_data: data + ' ' + i,
             },
         ];
-    }    
+    }        
     return {inline_keyboard: keyboard};
   }
   
@@ -220,16 +210,25 @@ function sendText(chatId, text, keyBoard) {
     var bookingrange = bookingsheet.getRange(1, 1, 93, 8);
     var bookingdata = bookingrange.getValues();    
 
+    var c = 0;
     var keyboard = [];
-    for (i = 0; i < 18; i++) {
-        keyboard[i] = [
+    for (i = 0; i < 18; i=i+3) {
+        keyboard[c] = [
             {
                 text: times[i],
                 callback_data: 'book-' + data + ' ' + i,
             },
+            {
+                text: times[i+1],
+                callback_data: 'book-' + data + ' ' + (i+1),
+            },
+            {
+                text: times[i+2],
+                callback_data: 'book-' + data + ' ' + (i+2),
+            },
         ];
+        c++;
     }
-
     sendText(userID, bookingdata[0][Number(data.split(' ')[1]) + 1] + ' what time?', {inline_keyboard: keyboard});
   }
   
@@ -356,81 +355,30 @@ function sendText(chatId, text, keyBoard) {
   }
   
   // counts how many of the 5 cells are occupied
-  function count(x, y) {
-    var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
-      'Current Week'
-    );
-    var searchRange = sheet.getRange(x, y, 5);
+  function count(row, col) {
+    var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
+    var searchRange = sheet.getRange(row, col, row + 4, col);
     var rangeValues = searchRange.getValues();
-    var count = 0;
-    var time = sheet.getRange(x, 1).getValue();
-  
-    for (i = 0; i < rangeValues.length; i++) {
-      if (rangeValues[i].toString().length !== 0) {
-        count++;
+    var c = 0;
+    var time = sheet.getRange(row, 1).getValue();  
+    for (i = 0; i < 5; i++) {
+      if (rangeValues[i][0].toString().length !== 0) {
+        c++;
       }
     }
-    return time + ': ' + count + '/5' + '\n';
+    return time + ': ' + c + '/5' + '\n';
   }
   
   // compiles counting of column from col x range y
-  function countCol(x, y, z) {
-    var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName(
-      'Current Week'
-    );
-    var day = sheet.getRange(1, y).getValue();
+  function viewTime(day) {
+    var sheet = SpreadsheetApp.openById(gymSheetId).getSheetByName('Current Week');
+    var daytext = sheet.getRange(1, day + 2).getValue();
     var result = '';
-    for (j = 0; j < z; j++) {
-      result += count(x + j * 5, y);
+    for (j = 0; j < 18; j++) {
+      result += count(j*5 + 2, day + 2);
     }
   
-    return day + '\n' + '---------------------' + '\n' + result;
-  }
-  
-  function viewTime(data) {
-    if (data === 'mon morn') {
-      return countCol(2, 2, 7);
-    } else if (data === 'mon night') {
-      return countCol(38, 2, 8);
-    } else if (data === 'tues midnight') {
-      return countCol(78, 2, 3);
-    } else if (data === 'tues morn') {
-      return countCol(2, 3, 7);
-    } else if (data === 'tues night') {
-      return countCol(38, 3, 8);
-    } else if (data === 'wed midnight') {
-      return countCol(78, 3, 3);
-    } else if (data === 'wed morn') {
-      return countCol(2, 4, 7);
-    } else if (data === 'wed night') {
-      return countCol(38, 4, 8);
-    } else if (data === 'thurs midnight') {
-      return countCol(78, 4, 3);
-    } else if (data === 'thurs morn') {
-      return countCol(2, 5, 7);
-    } else if (data === 'thurs night') {
-      return countCol(38, 5, 8);
-    } else if (data === 'fri midnight') {
-      return countCol(78, 5, 3);
-    } else if (data === 'fri morn') {
-      return countCol(2, 6, 7);
-    } else if (data === 'fri night') {
-      return countCol(38, 6, 8);
-    } else if (data === 'sat midnight') {
-      return countCol(78, 6, 3);
-    } else if (data === 'sat morn') {
-      return countCol(2, 7, 7);
-    } else if (data === 'sat night') {
-      return countCol(38, 7, 8);
-    } else if (data === 'sun midnight') {
-      return countCol(78, 7, 3);
-    } else if (data === 'sun morn') {
-      return countCol(2, 8, 7);
-    } else if (data === 'sun night') {
-      return countCol(38, 8, 8);
-    } else if (data === 'mon midnight') {
-      return countCol(78, 8, 3);
-    }
+    return daytext + '\n' + '---------------------' + '\n' + result;
   }
   
   // -----------------------------------------VIEW BANGYI END------------------------------------------------------
@@ -450,7 +398,7 @@ function sendText(chatId, text, keyBoard) {
       if (command === 'view') {
         // Logger.log(data.split('-')[1]);
         // Logger.log(viewTime(data.split('-')[1]));
-        sendText(idCallback, viewTime(data.split('-')[1]));
+        sendText(idCallback, viewTime(Number(data.split('-')[1])));
       } else if (command === 'eligible') {
         chooseTime(idCallback, data);
       } else if (command === 'book') {

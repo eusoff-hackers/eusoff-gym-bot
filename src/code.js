@@ -208,7 +208,7 @@ function sendText(chatId, text, keyBoard) {
   function eligibleSlots(userID) {
     var curruser = userExists(userID);
     // Logger.log(curruser.firstName.length);
-    if (curruser.firstName.length === 0) {
+    if (!curruser.firstName) {
       sendText(userID, "Hey there! We couldn't find you in our user database, join us using /register");
     } else {
       sendText(userID, 'Which day?', dayKeyboard('eligible-'));
@@ -345,13 +345,13 @@ function sendText(chatId, text, keyBoard) {
     // Logger.log(userID);
     var curruser = userExists(userID);
     // Logger.log(curruser.firstName.length);
-    if (curruser.firstName.length === 0) {
+    if (!curruser.firstName) {
       sendText(
         userID,
         "Hey there! We couldn't find you in our user database, join us using /register"
       );
     } else {
-      sendText(userID, 'Which session?', zoneKeyboard('view', curruser.zone));
+      sendText(userID, 'Which session?', dayKeyboard('view-', curruser.zone));
     }
   }
   
